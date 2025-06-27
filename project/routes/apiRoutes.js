@@ -13,17 +13,31 @@ router.get('/account', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener las cuentas' });
   }
 });
+// GET /events → Obtener todos los eventos
+router.get('/event/:eventId', async (req, res) => {
+  try {
+    const event = await Event.findOne({
+      eventId: parseInt(req.params.eventId),
+    });
+    if (!event) return res.status(404).json({ error: 'Evento no encontrado' });
+    res.json(event);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener el evento' });
+  }
+});
 
 // PUT /events/:id → Actualizar evento por ID
-router.put('/event/:id', async (req, res) => {
+router.put('/event/:eventId', async (req, res) => {
   try {
-    const updatedEvent = await Event.findByIdAndUpdate(
-      req.params.id,
+    const updatedEvent = await Event.findOneAndUpdate(
+      { eventId: parseInt(req.params.eventId) },
       req.body,
       { new: true }
     );
     if (!updatedEvent)
-      return res.status(404).json({ error: 'Evento no encontrado' });
+      return res
+        .status(404)
+        .json({ error: 'Evento no encontrado con ese eventId' });
     res.json(updatedEvent);
   } catch (err) {
     res.status(400).json({ error: 'Error al actualizar el evento' });
