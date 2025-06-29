@@ -5,6 +5,9 @@ const apiRoutes = require('./routes/apiRoutes');
 const accountRoutes = require('./routes/accountRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const processRoutes = require('./routes/processRoutes'); 
+const appointmentRoutes = require('./routes/appointmentRoutes');
+const reminderRoutes = require('./routes/reminderRoutes');
+ 
 
 const app = express();
 app.use(express.json());
@@ -12,6 +15,8 @@ app.use('/api', apiRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', eventRoutes);
 app.use('/api', processRoutes);
+app.use('/api', appointmentRoutes);
+app.use('/api', reminderRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI)

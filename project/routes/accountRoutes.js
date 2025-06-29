@@ -8,7 +8,7 @@ router.get("/accounts", async (req,res) => {
         const accounts = await account.find();
         res.json(accounts);
     } catch (err){
-        res.status(500).json({message: err,message});
+        res.status(500).json({message: err.message});
     }
 });*/
 
@@ -17,7 +17,7 @@ router.get("/account/:id", async (req,res) => {
         const accounts = await account.findOne({accountId : req.params.id});
         res.json(accounts);
     } catch (err){
-        res.status(500).json({message: err,message});
+        res.status(500).json({message: err.message});
     }
 });
 
@@ -34,7 +34,7 @@ router.post("/account", async (req,res) => {
         const insertedAccount = await newAccount.save();
         res.status(201).json(insertedAccount);
     } catch (err){
-        res.status(500).json({message: err,message});
+        res.status(500).json({message: err.message});
     }
 });
 
@@ -49,7 +49,7 @@ router.put("/accounts/update/:id", async (req,res) => {
         const update = await account.findOneAndUpdate({accountId: req.params.id},updatedAccount, {new: true});
         res.status(200).json(update);
     } catch (err){
-        res.status(500).json({message: err,message});
+        res.status(500).json({message: err.message});
     }
 });
 
@@ -61,7 +61,7 @@ router.delete('/accounts/delete/:id', async (req,res)=>{
     }
     catch(err)
     {
-        res.status(500).json({message: err,message});
+        res.status(500).json({message: err.message});
     }
 });
 

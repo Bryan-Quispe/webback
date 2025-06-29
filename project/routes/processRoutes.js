@@ -106,8 +106,7 @@ router.get("/process/:id/summary", async (req,res) => {
             {
                 name: 1,
                 dateStart: 1,
-                dateEnd: 1,
-                _id: 0
+                dateEnd: 1
             };
             const processEvents= await event.find({processId: req.params.id}).sort({orderIndex: 'asc'}).select(selectionQuery);
             const startDate = processEvents[0].dateStart;

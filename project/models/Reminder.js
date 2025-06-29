@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const reminderSchema = new mongoose.Schema({
   reminderId: Number,
-  content: String,
+  title: String,
   dateTime: Date,
   activeFlag: Boolean,
   appointmentId: Number
