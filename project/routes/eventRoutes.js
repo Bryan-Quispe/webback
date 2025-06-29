@@ -3,15 +3,16 @@ const event = require("../models/Event");
 const router = express.Router();
 
 //GET all events
-/*router.get("/events", async (req,res) => {
+router.get("/events", async (req,res) => {
     try{
         const events = await event.find();
         res.json(events);
     } catch (err){
         res.status(500).json({message: err,message});
     }
-});*/
+});
 //Get event by Id
+/*
 router.get("/event/:id", async (req,res) => {
     try{
         const retrievedEvent = await event.findOne({eventId : req.params.id});
@@ -19,7 +20,7 @@ router.get("/event/:id", async (req,res) => {
     } catch (err){
         res.status(500).json({message: err,message});
     }
-});
+});*/
 //Get event by process Id
 router.get("/events/searchByProcess/:processId", async (req,res) => {
     try{
@@ -49,7 +50,7 @@ router.post("/event", async (req,res) => {
 });
 /*
 //Update URI
-router.put("/events/update/:id", async (req,res) => {
+router.put("/event/update/:id", async (req,res) => {
     const updatedEvent ={
         orderIndex:req.body.orderIndex,
         name:req.body.name,

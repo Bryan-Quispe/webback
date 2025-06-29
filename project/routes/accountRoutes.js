@@ -2,15 +2,15 @@ const express = require("express");
 const account = require("../models/Account");
 const router = express.Router();
 
-/*
+
 router.get("/accounts", async (req,res) => {
     try{
         const accounts = await account.find();
         res.json(accounts);
     } catch (err){
-        res.status(500).json({message: err.message});
+        res.status(500).json({ error: 'Error al obtener las cuentas' });
     }
-});*/
+});
 
 router.get("/account/:id", async (req,res) => {
     try{

@@ -76,5 +76,4 @@ router.delete('/appointment/delete/:id', async (req,res)=>{
         res.status(500).json({message: 'Error al eliminar el pendiente'});
     }
 });
-
 module.exports = router;
