@@ -11,8 +11,9 @@ const adviceRoutes = require('./routes/legalAdviceRoutes');
 const auditoryRoutes = require('./routes/auditoryLogRoutes');
 const observationRoutes = require('./routes/observationRoutes');
 const evidenceRoutes = require('./routes/evidenceRoutes');
-const observationRoutes = require('./routes/qualificationRoutes');
-const evidenceRoutes = require('./routes/userProfileRoutes');
+const qualificationRoutes = require('./routes/qualificationRoutes');
+const userProfileRoutes = require('./routes/userProfileRoutes');
+
 
 
 const app = express();
