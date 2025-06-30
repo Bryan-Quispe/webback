@@ -9,7 +9,11 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const reminderRoutes = require('./routes/reminderRoutes');
 const adviceRoutes = require('./routes/legalAdviceRoutes');
 const auditoryRoutes = require('./routes/auditoryLogRoutes');
- 
+const observationRoutes = require('./routes/observationRoutes');
+const evidenceRoutes = require('./routes/evidenceRoutes');
+const observationRoutes = require('./routes/qualificationRoutes');
+const evidenceRoutes = require('./routes/userProfileRoutes');
+
 
 const app = express();
 app.use(express.json());
@@ -21,6 +25,11 @@ app.use('/api', appointmentRoutes);
 app.use('/api', reminderRoutes);
 app.use('/api', adviceRoutes);
 app.use('/api', auditoryRoutes);
+app.use('/api', observationRoutes);
+app.use('/api', evidenceRoutes);
+app.use('/api', qualificationRoutes);
+app.use('/api', userProfileRoutes);
+
 
 mongoose
   .connect(process.env.MONGODB_URI)
