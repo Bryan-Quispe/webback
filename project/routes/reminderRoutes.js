@@ -53,7 +53,7 @@ router.post("/reminder", async (req,res) => {
     }
 });
 
-router.put("/reminder/update/:id", async (req,res) => {
+router.put("/reminder/:id", async (req,res) => {
     const updatedReminder ={
             title: req.body.title,
             dateTime: req.body.dateTime,
@@ -68,7 +68,7 @@ router.put("/reminder/update/:id", async (req,res) => {
 });
 
 
-router.delete('/reminder/delete/:id', async (req,res)=>{
+router.delete('/reminder/:id', async (req,res)=>{
     try
     {
         const reminderDeleted = await reminder.deleteOne({reminderId: req.params.id});

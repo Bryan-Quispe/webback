@@ -47,7 +47,7 @@ router.post("/legalAdvice", async (req,res) => {
     }
 });
 
-router.put("/legalAdvice/update/:id", async (req,res) => {
+router.put("/legalAdvice/:id", async (req,res) => {
     const updatedLegalAdvice ={
             topic: req.body.topic,
             content: req.body.content
@@ -61,7 +61,7 @@ router.put("/legalAdvice/update/:id", async (req,res) => {
 });
 
 
-router.delete('/legalAdvice/delete/:id', async (req,res)=>{
+router.delete('/legalAdvice/:id', async (req,res)=>{
     try
     {
         const legalAdviceDeleted = await legalAdvice.deleteOne({adviceId: req.params.id});
@@ -74,7 +74,7 @@ router.delete('/legalAdvice/delete/:id', async (req,res)=>{
 });
 
 //Buisness Rule URIs
-router.get("/legalAdvice/attach/:id", async (req,res) => {
+router.get("/legalAdvice/:id/attachment", async (req,res) => {
     try{
         const selectedText =req.body.text;
         const adviceId=req.params.id;

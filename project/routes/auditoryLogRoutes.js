@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const dateFns=require('date-fns');
 const auditoryLog = require('../models/AuditoryLog');
 
 router.get('/auditoryLogs' , async(req,res)=>{
@@ -33,36 +34,36 @@ router.get('/auditoryLog/:id' , async(req,res)=>{
     }
 });
 
-router.get('/auditoryLogs/searchByUser/:id' , async(req,res)=>{
+router.get('/auditoryLogs/user/:id' , async(req,res)=>{
     try
     {
         const userActivityLogs= await auditoryLog.find({accountId: req.params.id});
-        if(auditoryLogObject!=null)
+        if(userActivityLogs.length>0)
         {
             res.status(200).json(userActivityLogs);
         }
         else
         {
-            res.status(404).json({error: 'Registro de actividad no encontrado'});
+            res.status(200).json({message: 'No hay actividad registrada del usuario'});
         }
     }
     catch(err)
     {
-        res.status(500).json({error: 'Error al buscar el registro'});
+        res.status(500).json({error: 'Error al buscar los registros'});
     }
 });
 
-router.get('/auditoryLogs/searchByProcess/:id' , async(req,res)=>{
+router.get('/auditoryLogs/process/:id' , async(req,res)=>{
     try
     {
-        const userActivityLogs= await auditoryLog.find({processId: req.params.id});
-        if(auditoryLogObject!=null)
+        const processActivityLogs= await auditoryLog.find({processId: req.params.id});
+        if(processActivityLogs.length>0)
         {
-            res.status(200).json(userActivityLogs);
+            res.status(200).json(processActivityLogs);
         }
         else
         {
-            res.status(404).json({error: 'Registro de actividad no encontrado'});
+            res.status(200).json({error: 'No se ha detectado actividad sobre este proceso'});
         }
     }
     catch(err)
@@ -72,10 +73,11 @@ router.get('/auditoryLogs/searchByProcess/:id' , async(req,res)=>{
 });
 
 router.post("/auditoryLog", async (req,res) => {
+    const currentDate=new Date();
     const newAuditoryLog =new auditoryLog({
             auditoryLogId: req.body.auditoryLogId,
             logAction: req.body.logAction,
-            logTime: new Date(),
+            logTime: currentDate,
             accountId: req.body.accountId,
             processId: req.body.processId
     });

@@ -52,7 +52,7 @@ router.post("/appointment", async (req,res) => {
     }
 });
 
-router.put("/appointment/update/:id", async (req,res) => {
+router.put("/appointment/:id", async (req,res) => {
     const updatedAppointment ={
             type: req.body.type,
             date: req.body.date,
@@ -67,7 +67,7 @@ router.put("/appointment/update/:id", async (req,res) => {
     }
 });
 
-router.delete('/appointment/delete/:id', async (req,res)=>{
+router.delete('/appointment/:id', async (req,res)=>{
     try
     {
         const appointmentDeleted = await appointment.deleteOne({appointmentId: req.params.id});
