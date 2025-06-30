@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const apiRoutes = require('./routes/apiRoutes');
 const accountRoutes = require('./routes/accountRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const processRoutes = require('./routes/processRoutes'); 
@@ -18,7 +17,6 @@ const userProfileRoutes = require('./routes/userProfileRoutes');
 
 const app = express();
 app.use(express.json());
-app.use('/api', apiRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', eventRoutes);
 app.use('/api', processRoutes);
