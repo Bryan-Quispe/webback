@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const dateFns = require('date-fns');
 const appointment = require('../models/Appointment');
+const reminder = require('../models/Reminder');
 
 router.get('/account/:accountId/appointments' , async(req,res)=>{
     try
     {
-        const appointmentList = await appointment.find({appointmentId: req.params.accountId}).sort({date: 'asc'});
+        const appointmentList = await appointment.find({accountId: req.params.accountId}).sort({date: 'asc'});
         res.status(200).json(appointmentList);
     }
     catch(err)
@@ -76,4 +78,112 @@ router.delete('/appointment/delete/:id', async (req,res)=>{
         res.status(500).json({message: 'Error al eliminar el pendiente'});
     }
 });
+
+router.get('/account/:accountId/appointments/:year/:month', async(req,res)=>{
+    const selectedMonth=Number(req.params.month)-1;
+    const selectedYear=Number(req.params.year);
+    const dateComparer=new Date(selectedYear,selectedMonth, 1);
+    const monthCalendar=[];
+    let appointmentDate;
+    try
+    {
+        const appointmentList= await appointment.find({accountId: req.params.accountId});
+        for(i=0;i<appointmentList.length;i++)
+        {
+            appointmentDate=new Date(appointmentList[i].date);
+            if(dateFns.isSameMonth(dateComparer, appointmentDate))
+            {
+                monthCalendar.push(appointmentList[i]);
+            }
+        }
+        res.status(200).json(monthCalendar);
+    }
+    catch(err)
+    {
+        res.status(500).json({message: 'Error al recuperar el calendario'});
+    }
+});
+
+router.get('/account/:accountId/appointments/week', async(req,res)=>{
+    const currentDate=new Date();
+    const weekStart=dateFns.startOfWeek(currentDate, {weekStartsOn: 1});
+    const weekEnd=dateFns.endOfWeek(currentDate, {weekStartsOn: weekStart.getDay()});
+    try
+    {
+        const appointmentList= await appointment.find({accountId: req.params.accountId, date: {$gte: weekStart, $lte: weekEnd}});
+        if(appointmentList.length>0)
+        {
+            res.status(200).json(appointmentList);
+        }
+        else
+        {
+            res.status(200).json({message: "No hay pendientes para la semana"});
+        }
+    }
+    catch(err)
+    {
+        res.status(500).json({message: 'Error al recuperar el calendario'});
+    }
+});
+
+router.get('/account/:accountId/appointments/close', async(req,res)=>{
+    const currentDate=new Date();
+    const threeDaysFromToday=dateFns.addDays(currentDate, 3);
+    try
+    {
+        const appointmentList= await appointment.find({accountId: req.params.accountId, date: {$gte: currentDate, $lte: threeDaysFromToday}});
+        if(appointmentList.length>0)
+        {
+            res.status(200).json(appointmentList);
+        }
+        else
+        {
+            res.status(200).json({message: "No hay pendientes proximos"});
+        }
+    }
+    catch(err)
+    {
+        res.status(500).json({message: 'Error al recuperar los pendientes proximos'});
+    }
+});
+
+router.post('/appointment/:id/reminder', async(req,res)=>{
+    try
+    {
+        const appointmentObject=await appointment.findOne({appointmentId: req.params.id});
+        const newReminderId=await reminder.countDocuments({})+1;
+        const numberOfDaysBefore= req.body.daysBefore;
+        const reminderDate=dateFns.subDays(new Date(appointmentObject.date), numberOfDaysBefore);
+        const newReminder=new reminder(
+            {
+                reminderId: newReminderId,
+                title: req.body.title ?? appointmentObject.type,
+                dateTime: reminderDate,
+                activeFlag: true,
+                appointmentId: appointmentObject.appointmentId
+            }
+        );
+        if(numberOfDaysBefore<1)
+        {
+            res.status(400).json({message: 'Error, el numero de dias no puede ser menor a 1'});
+        }
+        else
+        {
+            const createdReminder=await newReminder.save();
+            if(createdReminder)
+            {
+                res.status(200).json(createdReminder);
+            }
+            else
+            {
+                res.status(400).json({message: "Error al crear el recordatorio"});
+            }
+        }
+    }
+    catch(err)
+    {
+        res.status(500).json({message: "Error al crear el recordatorio"});
+    }
+});
+
 module.exports = router;

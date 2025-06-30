@@ -75,7 +75,7 @@ router.post("/auditoryLog", async (req,res) => {
     const newAuditoryLog =new auditoryLog({
             auditoryLogId: req.body.auditoryLogId,
             logAction: req.body.logAction,
-            logTime: req.body.logTime,
+            logTime: new Date(),
             accountId: req.body.accountId,
             processId: req.body.processId
     });
