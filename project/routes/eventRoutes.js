@@ -115,4 +115,27 @@ router.get("/events/getFirstToLastList", async (req, res) => {
     }
 });
 
+// Obtener el proceso relacionado a un evento
+const process = require("../models/Process");
+
+router.get("/events/getProcess", async (req, res) => {
+    const { event_id } = req.query;
+    try {
+        const targetEvent = await event.findOne({ eventId: event_id });
+        if (!targetEvent) {
+            return res.status(404).json({ message: "Evento no encontrado" });
+        }
+
+        const relatedProcess = await process.findOne({ processId: targetEvent.processId });
+        if (!relatedProcess) {
+            return res.status(404).json({ message: "Proceso no encontrado para este evento" });
+        }
+
+        res.status(200).json(relatedProcess);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
 module.exports = router;
