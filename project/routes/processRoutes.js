@@ -211,5 +211,19 @@ router.get("/processes/searchByType", async (req, res) => {
   }
 });
 
+//  Buscar por ID del proceso
+router.get("/processes/searchByProcessId", async (req, res) => {
+  const { process_id } = req.query;
+  try {
+    const result = await process.findOne({ processId: process_id });
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({ message: "Proceso no encontrado" });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;
