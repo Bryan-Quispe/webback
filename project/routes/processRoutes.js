@@ -162,4 +162,21 @@ router.get("/processes/searchByTitle", async (req, res) => {
   }
 });
 
+//  Buscar por rango de fechas de actualización
+router.get("/processes/searchByLastUpdate", async (req, res) => {
+  const { start_date, end_date } = req.query;
+  try {
+    const results = await process.find({
+      lastUpdate: {
+        $gte: new Date(start_date),
+        $lte: new Date(end_date)
+      }
+    });
+    res.status(200).json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 module.exports = router;
