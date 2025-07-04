@@ -178,5 +178,15 @@ router.get("/processes/searchByLastUpdate", async (req, res) => {
   }
 });
 
+//  Buscar por provincia
+router.get("/processes/searchByProvince", async (req, res) => {
+  const { province } = req.query;
+  try {
+    const results = await process.find({ province: { $regex: province, $options: "i" } });
+    res.status(200).json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;
