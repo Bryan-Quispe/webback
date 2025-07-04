@@ -189,4 +189,15 @@ router.get("/processes/searchByProvince", async (req, res) => {
   }
 });
 
+// Buscar por estado del proceso
+router.get("/processes/searchByStatus", async (req, res) => {
+  const { status } = req.query;
+  try {
+    const results = await process.find({ processStatus: status });
+    res.status(200).json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
