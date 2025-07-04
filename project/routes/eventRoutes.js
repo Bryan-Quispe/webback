@@ -77,5 +77,21 @@ router.delete('/events/delete/:id', async (req,res)=>{
     }
 });
 
+// Buscar eventos por rango de fechas
+router.get("/events/searchByDateRange", async (req, res) => {
+    const { start_date, end_date } = req.query;
+    try {
+        const events = await event.find({
+            dateStart: {
+                $gte: new Date(start_date),
+                $lte: new Date(end_date)
+            }
+        });
+        res.status(200).json(events);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 
 module.exports = router;
