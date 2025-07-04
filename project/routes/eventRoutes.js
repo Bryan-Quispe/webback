@@ -93,5 +93,26 @@ router.get("/events/searchByDateRange", async (req, res) => {
     }
 });
 
+// Listar eventos del más reciente al más antiguo
+router.get("/events/getLastToFirstList", async (req, res) => {
+    const { timeline_id } = req.query;
+    try {
+        const eventsList = await event.find({ timelineId: timeline_id }).sort({ dateStart: -1 });
+        res.status(200).json(eventsList);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Listar eventos del más antiguo al más reciente
+router.get("/events/getFirstToLastList", async (req, res) => {
+    const { timeline_id } = req.query;
+    try {
+        const eventsList = await event.find({ timelineId: timeline_id }).sort({ dateStart: 1 });
+        res.status(200).json(eventsList);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
 module.exports = router;
