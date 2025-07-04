@@ -151,4 +151,15 @@ function calculateWeeksMonthsElapsed(startDate, endDate)
     };
 }
 
+// Buscar por título
+router.get("/processes/searchByTitle", async (req, res) => {
+  const { title } = req.query;
+  try {
+    const results = await process.find({ title: { $regex: title, $options: "i" } });
+    res.status(200).json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
