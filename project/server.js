@@ -14,20 +14,19 @@ const qualificationRoutes = require('./routes/qualificationRoutes');
 const userProfileRoutes = require('./routes/userProfileRoutes');
 
 
-
 const app = express();
 app.use(express.json());
-app.use('/api', accountRoutes);
-app.use('/api', eventRoutes);
-app.use('/api', processRoutes);
-app.use('/api', appointmentRoutes);
-app.use('/api', reminderRoutes);
-app.use('/api', adviceRoutes);
-app.use('/api', auditoryRoutes);
-app.use('/api', observationRoutes);
-app.use('/api', evidenceRoutes);
-app.use('/api', qualificationRoutes);
-app.use('/api', userProfileRoutes);
+app.use('/legalsystem', accountRoutes);
+app.use('/legalsystem', eventRoutes);
+app.use('/legalsystem', processRoutes);
+app.use('/legalsystem', appointmentRoutes);
+app.use('/legalsystem', reminderRoutes);
+app.use('/legalsystem', adviceRoutes);
+app.use('/legalsystem', auditoryRoutes);
+app.use('/legalsystem', observationRoutes);
+app.use('/legalsystem', evidenceRoutes);
+app.use('/legalsystem', qualificationRoutes);
+app.use('/legalsystem', userProfileRoutes);
 
 
 mongoose

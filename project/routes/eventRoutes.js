@@ -12,7 +12,7 @@ router.get("/events", async (req,res) => {
     }
 });
 //Get event by Id
-/*
+
 router.get("/event/:id", async (req,res) => {
     try{
         const retrievedEvent = await event.findOne({eventId : req.params.id});
@@ -20,7 +20,7 @@ router.get("/event/:id", async (req,res) => {
     } catch (err){
         res.status(500).json({message: err,message});
     }
-});*/
+});
 //Get event by process Id
 router.get("/events/searchByProcess/:processId", async (req,res) => {
     try{
@@ -48,8 +48,7 @@ router.post("/event", async (req,res) => {
         res.status(500).json({message: err,message});
     }
 });
-/*
-//Update URI
+
 router.put("/event/update/:id", async (req,res) => {
     const updatedEvent ={
         orderIndex:req.body.orderIndex,
@@ -64,7 +63,7 @@ router.put("/event/update/:id", async (req,res) => {
     } catch (err){
         res.status(500).json({message: err,message});
     }
-});*/
+});
 //Delete URI
 router.delete('/events/delete/:id', async (req,res)=>{
     try

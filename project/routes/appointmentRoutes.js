@@ -3,11 +3,13 @@ const router = express.Router();
 const dateFns = require('date-fns');
 const appointment = require('../models/Appointment');
 const reminder = require('../models/Reminder');
+const reminderFunctions = require('../controllers/reminderController');
 
 router.get('/account/:accountId/appointments' , async(req,res)=>{
     try
     {
         const appointmentList = await appointment.find({accountId: req.params.accountId}).sort({date: 'asc'});
+        
         res.status(200).json(appointmentList);
     }
     catch(err)
@@ -154,25 +156,25 @@ router.post('/appointment/:id/reminder', async(req,res)=>{
         const newReminderId=await reminder.countDocuments({})+1;
         const numberOfDaysBefore= req.body.daysBefore;
         const reminderDate=dateFns.subDays(new Date(appointmentObject.date), numberOfDaysBefore);
-        const newReminder=new reminder(
-            {
+        const reminderData={
+            body:{
                 reminderId: newReminderId,
                 title: req.body.title ?? appointmentObject.type,
                 dateTime: reminderDate,
                 activeFlag: true,
                 appointmentId: appointmentObject.appointmentId
             }
-        );
-        if(numberOfDaysBefore<1)
+        };
+        if(numberOfDaysBefore<0 && dateFns.differenceInHours(appointmentObject.date, reminderDate)<3)
         {
-            res.status(400).json({message: 'Error, el numero de dias no puede ser menor a 1'});
+            res.status(400).json({message: 'Error, no se pueden crear recordatorios para menos de 3 horas antes '});
         }
         else
         {
-            const createdReminder=await newReminder.save();
+            const createdReminder=await reminderFunctions.createReminder(reminderData);
             if(createdReminder)
             {
-                res.status(200).json(createdReminder);
+                res.status(200).json({message: 'Recordatorio creado con éxito'});
             }
             else
             {
