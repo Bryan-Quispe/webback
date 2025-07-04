@@ -200,4 +200,16 @@ router.get("/processes/searchByStatus", async (req, res) => {
   }
 });
 
+//  Buscar por tipo de proceso
+router.get("/processes/searchByType", async (req, res) => {
+  const { type } = req.query;
+  try {
+    const results = await process.find({ processType: type });
+    res.status(200).json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 module.exports = router;
