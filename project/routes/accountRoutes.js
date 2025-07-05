@@ -75,8 +75,9 @@ router.post("/accounts/login", async (req, res) => {
 
   try {
     const user = await account.findOne({ email });
-
     if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+    console.log("Password DB:", user.password);
 
     if (!user.password || typeof user.password !== 'string') {
       return res.status(500).json({ error: "Password inválido en base de datos" });
@@ -105,8 +106,7 @@ router.post("/accounts/login", async (req, res) => {
       token,
     });
   } catch (err) {
-    console.error("❌ Error en login:", err.message);
-    console.error(err.stack);
+    console.error("❌ Error en login:", err);
     res.status(500).json({ error: "Error interno en login" });
   }
 });
