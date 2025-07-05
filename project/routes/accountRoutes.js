@@ -1,5 +1,7 @@
 const express = require("express");
 const account = require("../models/Account");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 
 
@@ -72,13 +74,15 @@ router.post("/accounts/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    
     const user = await account.findOne({ email });
 
     if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
-    const isHashed = user.password.startsWith("$2");
+    if (!user.password || typeof user.password !== 'string') {
+      return res.status(500).json({ error: "Password inválido en base de datos" });
+    }
 
+    const isHashed = user.password.startsWith("$2");
     let match = false;
 
     if (isHashed) {
@@ -100,9 +104,9 @@ router.post("/accounts/login", async (req, res) => {
       email: user.email,
       token,
     });
-
   } catch (err) {
-    console.error("❌ Error en login:", err);
+    console.error("❌ Error en login:", err.message);
+    console.error(err.stack);
     res.status(500).json({ error: "Error interno en login" });
   }
 });
