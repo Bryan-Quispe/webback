@@ -113,25 +113,38 @@ router.post("/accounts/login", async (req, res) => {
 
 
 // Solicitud de restablecimiento de contraseña
+function generateResetToken(length = 32) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let token = '';
+  for (let i = 0; i < length; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
+}
+
 router.post("/accounts/requestPasswordReset", async (req, res) => {
-   console.log("📩 Request reset → Body recibido:", req.body);
-    const { email } = req.body;
+  console.log("📩 Request reset → Body recibido:", req.body);
+  const { email } = req.body;
   try {
     const user = await account.findOne({ email });
     if (!user) return res.status(404).json({ error: "Correo no encontrado" });
 
-    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetToken = generateResetToken(32);
     user.resetToken = resetToken;
     user.tokenExpires = Date.now() + 3600000; // 1 hora
+
     await user.save();
 
     res.status(200).json({
       message: "Password reset link sent to email",
+      resetToken // para pruebas, remuévelo en producción
     });
   } catch (err) {
+    console.error("❌ Error en requestPasswordReset:", err);
     res.status(500).json({ error: "Error al generar token de reseteo" });
   }
 });
+
 
 // Envío de correo de recuperación (simulado por consola)
 router.post("/accounts/sendRecoveryEmail", async (req, res) => {
