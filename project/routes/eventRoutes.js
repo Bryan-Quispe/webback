@@ -106,29 +106,41 @@ router.get("/events/searchByDateRange", async (req, res) => {
 });
 
 // Listar eventos del más reciente al más antiguo
-router.get("/events/getLastToFirstList", async (req, res) => {
+router.get("/events/getByProcessOrdered", async (req, res) => {
   const { process_id } = req.query;
 
+  if (!process_id) {
+    return res.status(400).json({ message: "Se requiere process_id" });
+  }
+
   try {
-    const eventsList = await event.find({ processId: Number(process_id) }).sort({ dateStart: -1 });
+    const pid = Number(process_id);
+    const eventsList = await event.find({ processId: pid }).sort({ dateStart: 1 });
     res.status(200).json(eventsList);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 
 // Listar eventos del más antiguo al más reciente
-router.get("/events/getFirstToLastList", async (req, res) => {
+router.get("/events/getByProcessOrderedDesc", async (req, res) => {
   const { process_id } = req.query;
 
+  if (!process_id) {
+    return res.status(400).json({ message: "Se requiere process_id" });
+  }
+
   try {
-    const eventsList = await event.find({ processId: Number(process_id) }).sort({ dateStart: 1 });
+    const pid = Number(process_id);
+    const eventsList = await event.find({ processId: pid }).sort({ dateStart: -1 }); // descendente
     res.status(200).json(eventsList);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 
 
