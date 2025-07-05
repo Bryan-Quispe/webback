@@ -67,30 +67,46 @@ router.delete('/accounts/delete/:id', async (req,res)=>{
 
 // Login de usuario
 router.post("/accounts/login", async (req, res) => {
-   console.log("📩 Request reset → Body recibido:", req.body);
-    const { username, password } = req.body;
+  console.log("📩 Login → Datos recibidos:", req.body);
+
+  const { email, password } = req.body;
+
   try {
-    const user = await account.findOne({ username });
+    
+    const user = await account.findOne({ email });
+
     if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
-    const match = await bcrypt.compare(password, user.password);
+    const isHashed = user.password.startsWith("$2");
+
+    let match = false;
+
+    if (isHashed) {
+      match = await bcrypt.compare(password, user.password);
+    } else {
+      match = password === user.password;
+    }
+
     if (!match) return res.status(401).json({ error: "Contraseña incorrecta" });
 
     const token = jwt.sign(
-      { id: user._id, username: user.username },
-      "clave_secreta", // Reemplaza con una variable de entorno segura
+      { id: user._id, email: user.email },
+      "clave_secreta",
       { expiresIn: "1h" }
     );
 
     res.status(200).json({
-      account_id: user.accountId,
-      username: user.username,
+      account_id: user.accountId || user.account_id,
+      email: user.email,
       token,
     });
+
   } catch (err) {
-    res.status(500).json({ error: "Error en login" });
+    console.error("❌ Error en login:", err);
+    res.status(500).json({ error: "Error interno en login" });
   }
 });
+
 
 // Solicitud de restablecimiento de contraseña
 router.post("/accounts/requestPasswordReset", async (req, res) => {
