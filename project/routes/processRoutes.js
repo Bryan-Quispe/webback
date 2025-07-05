@@ -167,7 +167,7 @@ router.get("/processes/searchByLastUpdate", async (req, res) => {
   const { start_date, end_date } = req.query;
   try {
     const results = await process.find({
-      last_Update: {
+      last_update: {
         $gte: new Date(start_date),
         $lte: new Date(end_date)
       }
@@ -193,7 +193,7 @@ router.get("/processes/searchByProvince", async (req, res) => {
 router.get("/processes/searchByStatus", async (req, res) => {
   const { status } = req.query;
   try {
-    const results = await process.find({ process_Status: status });
+    const results = await process.find({ process_status: status });
     res.status(200).json(results);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -204,7 +204,7 @@ router.get("/processes/searchByStatus", async (req, res) => {
 router.get("/processes/searchByType", async (req, res) => {
   const { type } = req.query;
   try {
-    const results = await process.find({ process_Type: type });
+    const results = await process.find({ process_type: type });
     res.status(200).json(results);
   } catch (err) {
     res.status(500).json({ error: err.message });
