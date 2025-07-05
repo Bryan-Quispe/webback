@@ -162,16 +162,29 @@ router.get("/processes/searchByTitle", async (req, res) => {
   }
 });
 
-//  Buscar por rango de fechas de actualización
+// Buscar por rango de fechas de actualización
 router.get("/processes/searchByLastUpdate", async (req, res) => {
   const { start_date, end_date } = req.query;
+
+  if (!start_date || !end_date) {
+    return res.status(400).json({ error: "Se requieren start_date y end_date en el query" });
+  }
+
+  const start = new Date(start_date);
+  const end = new Date(end_date);
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    return res.status(400).json({ error: "Formato de fecha inválido. Usa YYYY-MM-DD o ISO 8601." });
+  }
+
   try {
     const results = await process.find({
       last_update: {
-        $gte: new Date(start_date),
-        $lte: new Date(end_date)
+        $gte: start,
+        $lte: end
       }
     });
+
     res.status(200).json(results);
   } catch (err) {
     res.status(500).json({ error: err.message });
