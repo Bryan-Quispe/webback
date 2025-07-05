@@ -65,4 +65,65 @@ router.delete('/accounts/delete/:id', async (req,res)=>{
     }
 });
 
+// Login de usuario
+router.post("/accounts/login", async (req, res) => {
+   console.log("📩 Request reset → Body recibido:", req.body);
+    const { username, password } = req.body;
+  try {
+    const user = await account.findOne({ username });
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(401).json({ error: "Contraseña incorrecta" });
+
+    const token = jwt.sign(
+      { id: user._id, username: user.username },
+      "clave_secreta", // Reemplaza con una variable de entorno segura
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({
+      account_id: user.accountId,
+      username: user.username,
+      token,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Error en login" });
+  }
+});
+
+// Solicitud de restablecimiento de contraseña
+router.post("/accounts/requestPasswordReset", async (req, res) => {
+   console.log("📩 Request reset → Body recibido:", req.body);
+    const { email } = req.body;
+  try {
+    const user = await account.findOne({ email });
+    if (!user) return res.status(404).json({ error: "Correo no encontrado" });
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetToken = resetToken;
+    user.tokenExpires = Date.now() + 3600000; // 1 hora
+    await user.save();
+
+    res.status(200).json({
+      message: "Password reset link sent to email",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Error al generar token de reseteo" });
+  }
+});
+
+// Envío de correo de recuperación (simulado por consola)
+router.post("/accounts/sendRecoveryEmail", async (req, res) => {
+   console.log("📩 Request reset → Body recibido:", req.body);
+    const { email, reset_token } = req.body;
+  try {
+    // Aquí iría nodemailer u otra lógica real de envío
+    console.log(`Enviar correo a ${email} con token: ${reset_token}`);
+    res.status(200).json({ message: "Recovery email sent" });
+  } catch (err) {
+    res.status(500).json({ error: "Error al enviar correo de recuperación" });
+  }
+});
+
 module.exports = router;
