@@ -79,63 +79,84 @@ router.delete('/events/delete/:id', async (req,res)=>{
 
 // Buscar eventos por rango de fechas
 router.get("/events/searchByDateRange", async (req, res) => {
-    const { start_date, end_date } = req.query;
-    try {
-        const events = await event.find({
-            dateStart: {
-                $gte: new Date(start_date),
-                $lte: new Date(end_date)
-            }
-        });
-        res.status(200).json(events);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+  const { start_date, end_date } = req.query;
+
+  if (!start_date || !end_date) {
+    return res.status(400).json({ message: "Se requieren start_date y end_date" });
+  }
+
+  const start = new Date(start_date);
+  const end = new Date(end_date);
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    return res.status(400).json({ message: "Fechas inválidas. Usa el formato YYYY-MM-DD o ISO 8601" });
+  }
+
+  try {
+    const events = await event.find({
+      dateStart: {
+        $gte: start,
+        $lte: end
+      }
+    });
+    res.status(200).json(events);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // Listar eventos del más reciente al más antiguo
 router.get("/events/getLastToFirstList", async (req, res) => {
-    const { timeline_id } = req.query;
-    try {
-        const eventsList = await event.find({ timelineId: timeline_id }).sort({ dateStart: -1 });
-        res.status(200).json(eventsList);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+  const { timeline_id } = req.query;
+
+  try {
+    const eventsList = await event.find({ timelineId: timeline_id }).sort({ dateStart: -1 });
+    res.status(200).json(eventsList);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // Listar eventos del más antiguo al más reciente
 router.get("/events/getFirstToLastList", async (req, res) => {
-    const { timeline_id } = req.query;
-    try {
-        const eventsList = await event.find({ timelineId: timeline_id }).sort({ dateStart: 1 });
-        res.status(200).json(eventsList);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+  const { timeline_id } = req.query;
+
+  try {
+    const eventsList = await event.find({ timelineId: timeline_id }).sort({ dateStart: 1 });
+    res.status(200).json(eventsList);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
+
 
 // Obtener el proceso relacionado a un evento
 const process = require("../models/Process");
 
 router.get("/events/getProcess", async (req, res) => {
-    const { event_id } = req.query;
-    try {
-        const targetEvent = await event.findOne({ eventId: event_id });
-        if (!targetEvent) {
-            return res.status(404).json({ message: "Evento no encontrado" });
-        }
+  const { event_id } = req.query;
 
-        const relatedProcess = await process.findOne({ processId: targetEvent.processId });
-        if (!relatedProcess) {
-            return res.status(404).json({ message: "Proceso no encontrado para este evento" });
-        }
+  if (!event_id) {
+    return res.status(400).json({ message: "Se requiere el event_id" });
+  }
 
-        res.status(200).json(relatedProcess);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+  try {
+    const targetEvent = await event.findOne({ eventId: Number(event_id) });
+    if (!targetEvent) {
+      return res.status(404).json({ message: "Evento no encontrado" });
     }
+
+    const relatedProcess = await process.findOne({ processId: targetEvent.processId });
+    if (!relatedProcess) {
+      return res.status(404).json({ message: "Proceso no encontrado para este evento" });
+    }
+
+    res.status(200).json(relatedProcess);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
+
 
 
 module.exports = router;
