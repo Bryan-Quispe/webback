@@ -1,9 +1,8 @@
 require('dotenv').config();
 const express = require('express');
-const nodemailer = require('nodemailer');
 const router = express.Router();
 const reminder = require('../models/Reminder');
-const reminderControl= require('../controllers/reminderController');
+const controller= require('../controllers/reminderController');
 
 router.get('/reminders' , async(req,res)=>{
     try
@@ -12,7 +11,7 @@ router.get('/reminders' , async(req,res)=>{
         res.status(200).json(reminderList);
     }
     catch(err)
-    {
+    { 
         res.status(500).json({error: 'Error al intentar recuperar los recordatorios'});
     }
 });
@@ -40,7 +39,7 @@ router.get('/reminder/:id' , async(req,res)=>{
 router.post('/reminder', async (req, res)=>
 {
     try{
-        const insertedReminder = await reminderControl.createReminder(req);
+        const insertedReminder = await controller.createReminder(req);
         res.status(201).json(insertedReminder);
     } catch (err){
         res.status(500).json({message: 'Error al crear el recordatorio'});
@@ -77,8 +76,8 @@ router.delete('/reminder/:id', async (req,res)=>{
 
 router.post("/reminder/:id/emailNotification", async (req, res) => {
   try {
-    const reminderEmail=await reminderControl.makeReminderEmail(req.params.id, req.body.emailReceiver);
-    const mailSent=await reminderControl.transporter.sendMail(reminderEmail);
+    const reminderEmail=await controller.makeReminderEmail(req.params.id, req.body.emailReceiver);
+    const mailSent=await controller.transporter.sendMail(reminderEmail);
     res.status(200).json({message: "Recordatorio enviado"});
   } catch (err) {
     res.status(500).json(err.message);

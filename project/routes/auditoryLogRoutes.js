@@ -88,5 +88,23 @@ router.post("/auditoryLog", async (req,res) => {
         res.status(500).json({message: err.message});
     }
 });
-
+router.put("/auditoryLog/:id", async (req,res) => {
+    const logUpdate ={
+            logAction: req.body.logAction
+    };
+    try{
+        const updatedLog = await auditoryLog.findOneAndUpdate({auditoryLogId: req.params.id},logUpdate,{new: true});
+        res.status(201).json(updatedLog);
+    } catch (err){
+        res.status(500).json({message: 'Error al actualizar el log'});
+    }
+});
+router.delete("/auditoryLog/:id", async (req,res) => {
+    try{
+        const deleteConfirmation = await auditoryLog.findOneAndDelete({auditoryLogId: req.params.id});
+        res.status(201).json({message: 'Log eliminado con éxito.'}, deleteConfirmation);
+    } catch (err){
+        res.status(500).json({message: 'Error al actualizar el log'});
+    }
+});
 module.exports = router;

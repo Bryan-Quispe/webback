@@ -46,11 +46,16 @@ async function makeReminderEmail(reminderId, receiver)
     };
     return reminderMail;
 }
-
+async function getNextId()
+{
+    const nextId=await reminder.countDocuments({})+1;
+    return nextId;
+}
 module.exports = {
     transporter,
     createReminder,
-    makeReminderEmail
+    makeReminderEmail,
+    getNextId
 };
 
 

@@ -78,8 +78,8 @@ router.get("/legalAdvice/:id/attachment", async (req,res) => {
     try{
         const selectedText =req.body.text;
         const adviceId=req.params.id;
-        let linkedText="<a href='/api/legalAdvice/"+adviceId+"'>"+selectedText+"</a>";
-        res.status(200).json(linkedText);
+        let linkedText="<a href='/legalstystem/legalAdvice/"+adviceId+"'>"+selectedText+"</a>";
+        res.status(200).send(linkedText);
     } catch (err){
         res.status(500).json({message: 'Error al vincular el tip'});
     }

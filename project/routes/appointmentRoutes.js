@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const dateFns = require('date-fns');
 const appointment = require('../models/Appointment');
-const reminder = require('../models/Reminder');
-const reminderFunctions = require('../controllers/reminderController');
+const controller = require('../controllers/appointmentController');
 
 router.get('/account/:accountId/appointments' , async(req,res)=>{
     try
@@ -82,23 +81,10 @@ router.delete('/appointment/:id', async (req,res)=>{
 });
 
 router.get('/account/:accountId/appointments/:year/:month', async(req,res)=>{
-    const selectedMonth=Number(req.params.month)-1;
-    const selectedYear=Number(req.params.year);
-    const dateComparer=new Date(selectedYear,selectedMonth, 1);
-    const monthCalendar=[];
-    let appointmentDate;
     try
     {
-        const appointmentList= await appointment.find({accountId: req.params.accountId});
-        for(i=0;i<appointmentList.length;i++)
-        {
-            appointmentDate=new Date(appointmentList[i].date);
-            if(dateFns.isSameMonth(dateComparer, appointmentDate))
-            {
-                monthCalendar.push(appointmentList[i]);
-            }
-        }
-        res.status(200).json(monthCalendar);
+        const monthAppointments=await controller.getAppointmentsByMonth(req.params.accountId, req.params.month, req.params.year);
+        res.status(200).json(monthAppointments);
     }
     catch(err)
     {
@@ -107,19 +93,16 @@ router.get('/account/:accountId/appointments/:year/:month', async(req,res)=>{
 });
 
 router.get('/account/:accountId/appointments/week', async(req,res)=>{
-    const currentDate=new Date();
-    const weekStart=dateFns.startOfWeek(currentDate, {weekStartsOn: 1});
-    const weekEnd=dateFns.endOfWeek(currentDate, {weekStartsOn: weekStart.getDay()});
     try
     {
-        const appointmentList= await appointment.find({accountId: req.params.accountId, date: {$gte: weekStart, $lte: weekEnd}});
-        if(appointmentList.length>0)
+        const weeklyAppointments= await controller.getWeeklyAppointments(req.params.accountId);
+        if(weeklyAppointments.length>0)
         {
-            res.status(200).json(appointmentList);
+            res.status(200).json(weeklyAppointments);
         }
         else
         {
-            res.status(200).json({message: "No hay pendientes para la semana"});
+            res.status(200).json({message: "No se han encontrado pendientes para la semana"});
         }
     }
     catch(err)
@@ -129,18 +112,16 @@ router.get('/account/:accountId/appointments/week', async(req,res)=>{
 });
 
 router.get('/account/:accountId/appointments/close', async(req,res)=>{
-    const currentDate=new Date();
-    const threeDaysFromToday=dateFns.addDays(currentDate, 3);
     try
     {
-        const appointmentList= await appointment.find({accountId: req.params.accountId, date: {$gte: currentDate, $lte: threeDaysFromToday}});
-        if(appointmentList.length>0)
+        const closeAppointments= await controller.getCloseAppointments(req.params.accountId);
+        if(closeAppointments.length>0)
         {
-            res.status(200).json(appointmentList);
+            res.status(200).json(closeAppointments);
         }
         else
         {
-            res.status(200).json({message: "No hay pendientes proximos"});
+            res.status(200).json({message: "No existen pendientes próximos"});
         }
     }
     catch(err)
@@ -150,42 +131,24 @@ router.get('/account/:accountId/appointments/close', async(req,res)=>{
 });
 
 router.post('/appointment/:id/reminder', async(req,res)=>{
-    try
-    {
-        const appointmentObject=await appointment.findOne({appointmentId: req.params.id});
-        const newReminderId=await reminder.countDocuments({})+1;
         const numberOfDaysBefore= req.body.daysBefore;
-        const reminderDate=dateFns.subDays(new Date(appointmentObject.date), numberOfDaysBefore);
-        const reminderData={
-            body:{
-                reminderId: newReminderId,
-                title: req.body.title ?? appointmentObject.type,
-                dateTime: reminderDate,
-                activeFlag: true,
-                appointmentId: appointmentObject.appointmentId
-            }
-        };
-        if(numberOfDaysBefore<0 && dateFns.differenceInHours(appointmentObject.date, reminderDate)<3)
+        if(numberOfDaysBefore<1)
         {
-            res.status(400).json({message: 'Error, no se pueden crear recordatorios para menos de 3 horas antes '});
+            res.status(400).json({message: 'Error, no se pueden crear recordatorios para menos de 1 día antes '});
         }
         else
         {
-            const createdReminder=await reminderFunctions.createReminder(reminderData);
-            if(createdReminder)
+            try
             {
-                res.status(200).json({message: 'Recordatorio creado con éxito'});
+                const createdReminder=await controller.setReminder(req.params.id, req.body.title, numberOfDaysBefore);
+                res.status(201).json({message: 'Recordatorio creado con éxito'});
             }
-            else
+            catch(err)
             {
-                res.status(400).json({message: "Error al crear el recordatorio"});
+                res.status(500).json({message: "Error al crear el recordatorio"});
             }
         }
     }
-    catch(err)
-    {
-        res.status(500).json({message: "Error al crear el recordatorio"});
-    }
-});
+);
 
 module.exports = router;
