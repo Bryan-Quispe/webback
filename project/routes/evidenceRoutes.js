@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const Evidence = require("../models/Evidence");
+const { authenticateToken } = require("../middleware/authenticateToken"); // 🔒 Seguridad
 const router = express.Router();
 
 // Configuración de almacenamiento de archivos
@@ -10,8 +11,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Crear evidencia
-router.post("/evidence", async (req, res) => {
+// 🔐 Crear evidencia
+router.post("/evidence", authenticateToken, async (req, res) => {
   try {
     const newEvidence = new Evidence(req.body);
     const saved = await newEvidence.save();
@@ -21,7 +22,7 @@ router.post("/evidence", async (req, res) => {
   }
 });
 
-// Obtener evidencia por evidenceId
+// 🔓 Obtener evidencia por evidenceId (consulta libre)
 router.get("/evidence/:id", async (req, res) => {
   try {
     const ev = await Evidence.findOne({ evidenceId: req.params.id });
@@ -31,8 +32,8 @@ router.get("/evidence/:id", async (req, res) => {
   }
 });
 
-// Actualizar evidencia
-router.put("/evidence/:id", async (req, res) => {
+// 🔐 Actualizar evidencia
+router.put("/evidence/:id", authenticateToken, async (req, res) => {
   try {
     const updated = await Evidence.findOneAndUpdate(
       { evidenceId: req.params.id },
@@ -45,8 +46,8 @@ router.put("/evidence/:id", async (req, res) => {
   }
 });
 
-// Eliminar evidencia
-router.delete("/evidence/:id", async (req, res) => {
+// 🔐 Eliminar evidencia
+router.delete("/evidence/:id", authenticateToken, async (req, res) => {
   try {
     const deleted = await Evidence.deleteOne({ evidenceId: req.params.id });
     res.status(200).json(deleted);
@@ -55,8 +56,8 @@ router.delete("/evidence/:id", async (req, res) => {
   }
 });
 
-// Subir archivo
-router.post("/evidence/upload", upload.single("file"), async (req, res) => {
+// 🔐 Subir archivo
+router.post("/evidence/upload", authenticateToken, upload.single("file"), async (req, res) => {
   try {
     res.status(200).json({ filePath: req.file.path });
   } catch (err) {
@@ -64,8 +65,8 @@ router.post("/evidence/upload", upload.single("file"), async (req, res) => {
   }
 });
 
-// Obtener evidencias por eventId
-router.get("/evidences/event/:eventId", async (req, res) => {
+// 🔐 Obtener evidencias por eventId
+router.get("/evidences/event/:eventId", authenticateToken, async (req, res) => {
   try {
     const list = await Evidence.find({ eventId: req.params.eventId });
     res.status(200).json(list);
@@ -75,3 +76,4 @@ router.get("/evidences/event/:eventId", async (req, res) => {
 });
 
 module.exports = router;
+

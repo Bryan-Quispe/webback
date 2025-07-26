@@ -1,8 +1,10 @@
 const express = require('express');
 const Qualification = require('../models/Qualification');
+const { authenticateToken } = require('../middleware/authenticateToken'); // 🛡️ Middleware de seguridad
+
 const router = express.Router();
 
-// Get all qualifications
+// 🔓 Obtener todas las calificaciones
 router.get('/qualifications', async (req, res) => {
   try {
     const qualifications = await Qualification.find();
@@ -12,7 +14,7 @@ router.get('/qualifications', async (req, res) => {
   }
 });
 
-// Get qualification by ID
+// 🔓 Obtener calificación por ID
 router.get('/qualification/:id', async (req, res) => {
   try {
     const qualification = await Qualification.findOne({ qualificationId: req.params.id });
@@ -22,8 +24,8 @@ router.get('/qualification/:id', async (req, res) => {
   }
 });
 
-// Create a qualification
-router.post('/qualification', async (req, res) => {
+// 🔐 Crear una calificación
+router.post('/qualification', authenticateToken, async (req, res) => {
   const newQualification = new Qualification({
     qualificationId: req.body.qualificationId,
     role: req.body.role,
@@ -43,8 +45,8 @@ router.post('/qualification', async (req, res) => {
   }
 });
 
-// Update a qualification
-router.put('/qualification/update/:id', async (req, res) => {
+// 🔐 Actualizar calificación
+router.put('/qualification/update/:id', authenticateToken, async (req, res) => {
   const updatedData = {
     role: req.body.role,
     institution: req.body.institution,
@@ -67,8 +69,8 @@ router.put('/qualification/update/:id', async (req, res) => {
   }
 });
 
-// Delete a qualification
-router.delete('/qualification/delete/:id', async (req, res) => {
+// 🔐 Eliminar calificación
+router.delete('/qualification/delete/:id', authenticateToken, async (req, res) => {
   try {
     const deleted = await Qualification.deleteOne({ qualificationId: req.params.id });
     res.status(200).json(deleted);
@@ -78,3 +80,4 @@ router.delete('/qualification/delete/:id', async (req, res) => {
 });
 
 module.exports = router;
+

@@ -1,8 +1,9 @@
 const express = require('express');
 const UserProfile = require('../models/UserProfile');
+const { authenticateToken } = require('../middleware/authenticateToken'); // Seguridad integrada
 const router = express.Router();
 
-// Get all user profiles
+// 🔓 Obtener todos los perfiles de usuario
 router.get('/profiles', async (req, res) => {
   try {
     const profiles = await UserProfile.find();
@@ -12,7 +13,7 @@ router.get('/profiles', async (req, res) => {
   }
 });
 
-// Get a user profile by ID
+// 🔓 Obtener perfil de usuario por ID
 router.get('/profile/:id', async (req, res) => {
   try {
     const profile = await UserProfile.findOne({ profileId: req.params.id });
@@ -22,8 +23,8 @@ router.get('/profile/:id', async (req, res) => {
   }
 });
 
-// Create a new user profile
-router.post('/profile', async (req, res) => {
+// 🔐 Crear nuevo perfil
+router.post('/profile', authenticateToken, async (req, res) => {
   const newProfile = new UserProfile({
     profileId: req.body.profileId,
     title: req.body.title,
@@ -41,8 +42,8 @@ router.post('/profile', async (req, res) => {
   }
 });
 
-// Update a user profile
-router.put('/profile/update/:id', async (req, res) => {
+// 🔐 Actualizar perfil existente
+router.put('/profile/update/:id', authenticateToken, async (req, res) => {
   const updatedData = {
     title: req.body.title,
     bio: req.body.bio,
@@ -63,8 +64,8 @@ router.put('/profile/update/:id', async (req, res) => {
   }
 });
 
-// Delete a user profile
-router.delete('/profile/delete/:id', async (req, res) => {
+// 🔐 Eliminar perfil
+router.delete('/profile/delete/:id', authenticateToken, async (req, res) => {
   try {
     const deletedProfile = await UserProfile.deleteOne({ profileId: req.params.id });
     res.status(200).json(deletedProfile);
@@ -73,8 +74,8 @@ router.delete('/profile/delete/:id', async (req, res) => {
   }
 });
 
-// Upload profile picture (you need multer config separately)
-router.post('/profile/uploadImage/:id', async (req, res) => {
+// 🔐 Subir imagen de perfil (requiere configuración de multer)
+router.post('/profile/uploadImage/:id', authenticateToken, async (req, res) => {
   try {
     const updated = await UserProfile.findOneAndUpdate(
       { profileId: req.params.id },
@@ -88,3 +89,4 @@ router.post('/profile/uploadImage/:id', async (req, res) => {
 });
 
 module.exports = router;
+
