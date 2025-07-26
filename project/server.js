@@ -1,3 +1,8 @@
+
+require("dotenv").config();
+const session = require("express-session");
+const passport = require("passport");
+require("./config/passport");
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -15,6 +20,10 @@ const userProfileRoutes = require('./routes/userProfileRoutes');
 
 
 const app = express();
+app.use(session({ secret: "secreto", resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(express.json());
 app.use('/legalsystem', accountRoutes);
 app.use('/legalsystem', eventRoutes);
@@ -40,3 +49,6 @@ mongoose
     });
   })
   .catch((err) => console.error('❌ Error conectando a MongoDB:', err));
+
+const authRoutes = require("./routes/authRoutes");
+app.use("/auth", authRoutes);
