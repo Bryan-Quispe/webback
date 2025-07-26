@@ -1,9 +1,10 @@
 const express = require("express");
 const Observation = require("../models/Observation");
+const { authenticateToken } = require("../middleware/authenticateToken"); // 🔐 Middleware
 const router = express.Router();
 
-// Crear una observación
-router.post("/observation", async (req, res) => {
+// 🔐 Crear una observación
+router.post("/observation", authenticateToken, async (req, res) => {
   try {
     const newObservation = new Observation(req.body);
     const saved = await newObservation.save();
@@ -13,7 +14,7 @@ router.post("/observation", async (req, res) => {
   }
 });
 
-// Obtener una observación por observationId
+// 🔓 Obtener una observación por observationId (consulta libre)
 router.get("/observation/:id", async (req, res) => {
   try {
     const obs = await Observation.findOne({ observationId: req.params.id });
@@ -23,8 +24,8 @@ router.get("/observation/:id", async (req, res) => {
   }
 });
 
-// Actualizar observación por observationId
-router.put("/observation/:id", async (req, res) => {
+// 🔐 Actualizar observación por observationId
+router.put("/observation/:id", authenticateToken, async (req, res) => {
   try {
     const updated = await Observation.findOneAndUpdate(
       { observationId: req.params.id },
@@ -37,8 +38,8 @@ router.put("/observation/:id", async (req, res) => {
   }
 });
 
-// Eliminar observación
-router.delete("/observation/:id", async (req, res) => {
+// 🔐 Eliminar observación
+router.delete("/observation/:id", authenticateToken, async (req, res) => {
   try {
     const deleted = await Observation.deleteOne({ observationId: req.params.id });
     res.status(200).json(deleted);
@@ -47,7 +48,7 @@ router.delete("/observation/:id", async (req, res) => {
   }
 });
 
-// Listar de último a primero
+// 🔓 Listar observaciones en orden descendente
 router.get("/observations/desc", async (req, res) => {
   try {
     const list = await Observation.find().sort({ observationId: -1 });
@@ -57,7 +58,7 @@ router.get("/observations/desc", async (req, res) => {
   }
 });
 
-// Listar de primero a último
+// 🔓 Listar observaciones en orden ascendente
 router.get("/observations/asc", async (req, res) => {
   try {
     const list = await Observation.find().sort({ observationId: 1 });
@@ -67,8 +68,8 @@ router.get("/observations/asc", async (req, res) => {
   }
 });
 
-// Listar por eventId
-router.get("/observations/event/:eventId", async (req, res) => {
+// 🔐 Listar observaciones por eventId
+router.get("/observations/event/:eventId", authenticateToken, async (req, res) => {
   try {
     const list = await Observation.find({ eventId: req.params.eventId });
     res.status(200).json(list);
@@ -78,3 +79,4 @@ router.get("/observations/event/:eventId", async (req, res) => {
 });
 
 module.exports = router;
+
