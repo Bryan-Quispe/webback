@@ -1,0 +1,44 @@
+.navbar
+{
+    background-color: #1C2C54;
+    color: #F9F9F6;
+}
+
+
+@theme{
+    --color-bone-white: #F9F9F6;
+    --color-regal-blue: #1C2C54;
+    --color-light-gold: #C9A66B;
+}
+
+.navLink
+{
+    color: #F9F9F6;
+}
+
+.navLink:hover, .navLink:active, .navLink:focus{
+    color: #C9A66B;
+}
+
+.navLink:focus
+{
+    font-weight: var(--font-weight-bold);
+}
+
+.navLink:focus .accountOptions
+{
+    font-weight: normal;
+}
+
+.accountOptions
+{
+    background-color: #A0A0A0;
+    color: #424242;
+}
+
+.accountOptions li:hover{
+    background-color: #7e7e7e;
+}
+.accountOptions:active, .accountOptions li:focus, .accountOptions li:active{
+    font-weight: bold;
+}

@@ -1,18 +1,74 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../App.css'
+import * as Icon from 'react-bootstrap-icons';
+import '../App.css';
+import './navbar.css';
+import LegalLogo from '../assets/LegalLogo.png';
+import {
+  UserCircleIcon,
+  CalendarIcon,
+  HomeIcon
+} from '@heroicons/react/24/outline'
+import userData from '../testData/userData';
 
 export default function NavBarMain()
 {
+    const [user, SetUser] = useState(userData);
+    const [accountClicked, handleAccountOptions] = useState(false);
+    const getUserData = () => SetUser(userData);
+    const toggleAccountOptions = () => handleAccountOptions(!accountClicked);
+    const closeAccountOptions = () => {
+
+    };
+    const accountOptionsState = (accountClicked) ? "block" : "hidden";
+
     return (
     <>
-      <header className="bg-dark-card text-white py-3 shadow-sm w-100">
-      <div className="container d-flex justify-content-between align-items-center">
-        <div className="fw-bold fs-5">🖼️ Abg. Luz Romero</div>
-        <nav>
-          <Link className="text-white me-3 text-decoration-none" to={'/'}>Inicio</Link>
-          <Link className="text-white me-3 text-decoration-none" to={'/appointments'}>Pendientes</Link>
-        </nav>
+      <header className="navbar text-zinc-900 py-3 px-3 shadow-sm w-screen z-20">
+      <div className="flex justify-between items-center">
+        <div className='flex flex-row items-center'>
+          <div>
+            <img src={LegalLogo} className='h-9 w-9 inline-block' />
+          </div>
+          <div className=" font-bold text-x1">{user.name} {user.lastname}</div>
+        </div>
+        <div className=''>
+          <nav>
+            <ul className='flex flex-row space-x-3'>
+              <li>
+                <Link className="navLink text-bone-white me-3 text-decoration-none" to={'/dashboard'}>
+              <HomeIcon className='inline-block h-4 w-4'/>Inicio
+            </Link>
+              </li>
+            <li>
+              <Link className="navLink text-bone-white me-3 text-decoration-none" to={'/appointments'}>
+              <CalendarIcon className='inline-block h-4 w-4'/>Pendientes
+            </Link>
+            </li>
+            <li className="navLink text-bone-white me-3">
+              <Icon.Bell className='inline-block h-4 w-4'/>
+            </li>
+            <li id="accountButton" className="navLink text-bone-white me-3 text-decoration-none" onClick={toggleAccountOptions}>
+              <UserCircleIcon className='inline-block h-6 w-6'/>
+              <div className={`bg-bone-white ${accountOptionsState} absolute rounded-md shadow-lg w-fit  mx-2 text-right right-0 mt-3 z-10}`}>
+                  <ul className='accountOptions'>
+                    <li>
+                      <Link className='text-decoration-none me-3' to={'/account'}>Datos Personales</Link>
+                    </li>
+                    <li>
+                      <Link className='text-decoration-none me-3' to={'/profile'}>Perfil Publico</Link>
+                    </li>
+                    <li>
+                      <Link className='text-decoration-none me-3' to={'/exit'}>Cerrar Sesion</Link>
+                    </li>
+                  </ul>
+              </div>
+            </li>
+            </ul>
+          </nav>
+
+        </div>
       </div>
     </header>
     </>

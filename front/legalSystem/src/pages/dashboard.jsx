@@ -6,7 +6,7 @@ export default function Dashboard()
 {
     return (
     <>
-     <div>
+     <div className=''>
         <h1>Inicio</h1>
      </div>
     </>

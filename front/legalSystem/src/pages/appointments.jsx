@@ -6,8 +6,8 @@ export default function Appointments()
 {
     return (
     <>
-     <div>
-        <h1>Pendientes</h1>
+     <div className=''>
+        <h1 className='font-size: text-inherit'>Pendientes</h1>
      </div>
     </>
     )
