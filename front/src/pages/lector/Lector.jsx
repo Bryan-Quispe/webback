@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllProcesses } from '../../api/processApi';
+import Navbar from '../../components/NavBarMain.jsx';
 
 export default function Lector() {
   const [processes, setProcesses] = useState([]);
@@ -80,8 +81,8 @@ export default function Lector() {
 
   return (
     <div className="min-h-screen bg-blue-950 text-white py-10 px-4">
+      <Navbar />
       <h1 className="text-3xl font-bold text-center mb-8">Procesos Públicos</h1>
-
       {/* Filtros */}
       <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-black">
         {/* Estado */}

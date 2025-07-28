@@ -1,10 +1,9 @@
-
-import { useState } from 'react'
+import { useState } from 'react';
 import { BrowserRouter, Outlet, Route, Router, Routes } from 'react-router-dom';
-import Dashboard from './pages/dashboard.jsx'
-import Appointments from './pages/appointments.jsx'
+import Dashboard from './pages/dashboard.jsx';
+import Appointments from './pages/appointments.jsx';
 import LoginLayout from './layouts/loginLayout.jsx';
-import './App.css'
+import './App.css';
 import LayoutLawyer from './layouts/layoutLawyer.jsx';
 import LayoutUnauthorized from './layouts/layoutUnauthorized.jsx';
 import AccountData from './pages/accountData.jsx';
@@ -28,40 +27,46 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/login' element={<LoginLayout />}>
+        <Route path="/login" element={<LoginLayout />}></Route>
+        <Route path="/lawyer" element={<LayoutLawyer />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="appointments" element={<Appointments />} />
+          <Route path="account" element={<AccountData />} />
+          <Route path="case-dashboard" element={<CaseDashboard />} />
+          <Route path="case-info/:id" element={<CaseInfo />} />
+          <Route path="event-dashboard/:caseId" element={<EventDashboard />} />
+          <Route
+            path="evidence-dashboard/:caseId"
+            element={<EvidenceDashboard />}
+          />
+          <Route
+            path="observation-dashboard/:caseId"
+            element={<ObservationDashboard />}
+          />
+          <Route
+            path="pending-calendar/:caseId"
+            element={<PendingCalendar />}
+          />
+          <Route path="reminder-list" element={<ReminderList />} />
+          <Route path="audit-list" element={<AuditList />} />
+          <Route path="related-cases/:caseId" element={<RelatedCases />} />
         </Route>
-          <Route path="/lawyer" element={<LayoutLawyer />}>
-           <Route path="dashboard" element={<Dashboard />} />
-           <Route path="appointments" element={<Appointments />} />
-           <Route path="account" element={<AccountData />} />
-           <Route path="case-dashboard" element={<CaseDashboard />} />
-           <Route path="case-info/:id" element={<CaseInfo />} />
-           <Route path="event-dashboard/:caseId" element={<EventDashboard />} />
-           <Route path="evidence-dashboard/:caseId" element={<EvidenceDashboard />} />
-           <Route path="observation-dashboard/:caseId" element={<ObservationDashboard />} />
-           <Route path="pending-calendar/:caseId" element={<PendingCalendar />} />
-           <Route path="reminder-list" element={<ReminderList />} />
-           <Route path="audit-list" element={<AuditList />} />
-           <Route path="related-cases/:caseId" element={<RelatedCases />} />
+        <Route path="/unauthorized" element={<LayoutUnauthorized />}></Route>
+        <Route path="/" element={<Lector />}>
+          <Route
+            path="/lector/proceso/:processId"
+            element={<ProcesoResumen />}
+          />
+          <Route
+            path="/procesos/:processId/observaciones"
+            element={<ObservacionesLectura />}
+          />
+          <Route
+            path="/procesos/:processId/evidencias"
+            element={<EvidenciasLectura />}
+          />
+          <Route path="*" element={<div>404 Not Found</div>} />
         </Route>
-          <Route path='/unauthorized' element={<LayoutUnauthorized />}></Route>
-          <Route path='/' element={<ReaderLayout />}>
-          
-            <Route path='/lector' element={<Lector />}></Route>
-            <Route
-                path="/lector/proceso/:processId"
-                element={<ProcesoResumen />}
-              />
-            <Route
-                path="/procesos/:processId/observaciones"
-                element={<ObservacionesLectura />}
-              />
-            <Route
-                path="/procesos/:processId/evidencias"
-                element={<EvidenciasLectura />}
-              />
-              <Route path="*" element={<div>404 Not Found</div>} />
-          </Route>
       </Routes>
     </BrowserRouter>
   );
