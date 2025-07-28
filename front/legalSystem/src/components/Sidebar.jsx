@@ -22,7 +22,7 @@ export default function Sidebar(){
             <div>
                 <ul className='' onMouseEnter={handleOpenMenu} onMouseLeave={handleCloseMenu}>
                     <li className=''>
-                        <Link className='flex flex-row items-center space-x-2 text-decoration-none' to={'/processes'}>
+                        <Link className='flex flex-row items-center space-x-2 text-decoration-none' to={'/lawyer/processes'}>
                             {(menuExtended)? <Icon.FolderFill className='h-4 w-4 inline-block'/>
                             : <Icon.Folder2Open className='h-4 w-4 inline-block'/>
                             }
@@ -30,7 +30,7 @@ export default function Sidebar(){
                         </Link>
                     </li>
                     <li className=''>
-                        <Link className='flex flex-row items-center space-x-2 text-decoration-none ' to={'/events'}>
+                        <Link className='flex flex-row items-center space-x-2 text-decoration-none ' to={'/lawyer/events'}>
                             {(menuExtended)? <Icon.Grid3x2GapFill className='h-4 w-4 inline-block'/>
                             : <Icon.Grid3x2Gap className='h-4 w-4 inline-block'/>
                             }
@@ -38,7 +38,7 @@ export default function Sidebar(){
                         </Link>
                     </li>
                     <li className=''>
-                        <Link className='flex flex-row items-center space-x-2 text-decoration-none ' to={'/evidences'}>
+                        <Link className='flex flex-row items-center space-x-2 text-decoration-none ' to={'/lawyer/evidences'}>
                                 {(menuExtended)? <Icon.FileMedicalFill className='h-4 w-4 inline-block'/>
                             : <Icon.FileMedical className='h-4 w-4 inline-block'/>
                             }
@@ -46,7 +46,7 @@ export default function Sidebar(){
                         </Link>
                     </li>
                     <li className=''>
-                        <Link className='flex flex-row items-center space-x-2 text-decoration-none ' to={'/observations'}>
+                        <Link className='flex flex-row items-center space-x-2 text-decoration-none ' to={'/lawyer/observations'}>
                             {(menuExtended)? <Icon.JournalBookmarkFill className='h-4 w-4 inline-block'/>
                             : <Icon.Journal className='h-4 w-4 inline-block'/>
                             }

@@ -37,12 +37,12 @@ export default function NavBarMain()
           <nav>
             <ul className='flex flex-row space-x-3'>
               <li>
-                <Link className="navLink text-bone-white me-3 text-decoration-none" to={'/dashboard'}>
+                <Link className="navLink text-bone-white me-3 text-decoration-none" to={'/lawyer/dashboard'}>
               <HomeIcon className='inline-block h-4 w-4'/>Inicio
             </Link>
               </li>
             <li>
-              <Link className="navLink text-bone-white me-3 text-decoration-none" to={'/appointments'}>
+              <Link className="navLink text-bone-white me-3 text-decoration-none" to={'/lawyer/appointments'}>
               <CalendarIcon className='inline-block h-4 w-4'/>Pendientes
             </Link>
             </li>
@@ -54,13 +54,13 @@ export default function NavBarMain()
               <div className={`bg-bone-white ${accountOptionsState} absolute rounded-md shadow-lg w-fit  mx-2 text-right right-0 mt-3 z-10}`}>
                   <ul className='accountOptions'>
                     <li>
-                      <Link className='text-decoration-none me-3' to={'/account'}>Datos Personales</Link>
+                      <Link className='text-decoration-none me-3' to={'/lawyer/account'}>Datos Personales</Link>
                     </li>
                     <li>
-                      <Link className='text-decoration-none me-3' to={'/profile'}>Perfil Publico</Link>
+                      <Link className='text-decoration-none me-3' to={'/lawyer/profile'}>Perfil Publico</Link>
                     </li>
                     <li>
-                      <Link className='text-decoration-none me-3' to={'/exit'}>Cerrar Sesion</Link>
+                      <Link className='text-decoration-none me-3' to={'/lawyer/exit'}>Cerrar Sesion</Link>
                     </li>
                   </ul>
               </div>

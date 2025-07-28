@@ -98,7 +98,7 @@ router.post('/account/login', async (req, res) => {
 
     const token = jwt.sign(
       { id: user._id, email: user.email },
-      process.env.JWT_SECRET || 'secreto123', // ⚠️ Asegúrate de definir esta variable
+      process.env.JWT_SECRET || 'tu_clave_secreta', // ⚠️ Asegúrate de definir esta variable
       { expiresIn: '1h' }
     );
 

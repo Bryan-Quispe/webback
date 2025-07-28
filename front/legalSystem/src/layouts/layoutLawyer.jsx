@@ -6,7 +6,12 @@ import '../App.css'
 
 export default function LayoutLawyer() {
 
-  return (
+  if(!localStorage.token)
+  {
+    window.location.href='../unauthorized';
+  }
+  else{
+    return (
     <>
     <div className='container flex flex-col min-h-screen'>
       <NavBarMain />
@@ -19,6 +24,7 @@ export default function LayoutLawyer() {
     </div>
     </>
   );
+  }
 }
 
 
