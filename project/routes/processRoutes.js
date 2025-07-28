@@ -1,7 +1,7 @@
 const express = require('express');
 const process = require('../models/Process');
 const event = require('../models/Event');
-const { authenticateToken } = require('../middleware/authenticateToken'); // Middleware de seguridad
+const { authenticateToken } = require('../middleware/authenticateToken');
 
 const router = express.Router();
 
@@ -18,42 +18,42 @@ router.get('/processes', async (req, res) => {
 // 🔓 Obtener proceso por processId (libre)
 router.get('/process/:id', async (req, res) => {
   try {
-    const processId = Number(req.params.id); // 👈 convierte a número
+    const processId = Number(req.params.id);
     if (isNaN(processId)) {
       return res
         .status(400)
         .json({ message: 'El processId debe ser numérico' });
     }
-
     const processObject = await process.findOne({ processId });
-    processObject
-      ? res.status(200).json(processObject)
-      : res.status(404).json({ message: 'Proceso no encontrado' });
+    if (!processObject) {
+      return res.status(404).json({ message: 'Proceso no encontrado' });
+    }
+    res.status(200).json(processObject);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// 🔐 Crear nuevo proceso
+// 🔐 Crear nuevo proceso (autoincrementa processId y startDate automático)
 router.post('/process', authenticateToken, async (req, res) => {
-  const newProcess = new process({
-    processId: req.body.id,
-    accountId: req.body.account,
-    title: req.body.title,
-    processType: req.body.type,
-    offense: req.body.offense,
-    province: req.body.province,
-    canton: req.body.canton,
-    clientGender: req.body.clientGender,
-    clientAge: req.body.clientAge,
-    processStatus: req.body.status,
-    lastUpdate: req.body.lastUpdate,
-    startDate: req.body.startDate,
-    endDate: req.body.endDate,
-    processNumber: req.body.code,
-    processDescription: req.body.description,
-  });
   try {
+    const newProcess = new process({
+      accountId: req.body.accountId,
+      title: req.body.title,
+      processType: req.body.processType,
+      offense: req.body.offense,
+      province: req.body.province,
+      canton: req.body.canton,
+      clientGender: req.body.clientGender,
+      clientAge: req.body.clientAge,
+      processStatus: req.body.processStatus,
+      lastUpdate: req.body.lastUpdate || null,
+      // No envías startDate para que se asigne fecha actual automáticamente
+      endDate: req.body.endDate || null,
+      processNumber: req.body.processNumber,
+      processDescription: req.body.processDescription,
+    });
+
     const insertedProcess = await newProcess.save();
     res.status(201).json(insertedProcess);
   } catch (err) {
@@ -61,29 +61,34 @@ router.post('/process', authenticateToken, async (req, res) => {
   }
 });
 
-// 🔐 Actualizar proceso
+// 🔐 Actualizar proceso (actualiza lastUpdate automáticamente)
 router.put('/process/:id/update', authenticateToken, async (req, res) => {
-  const updatedProcess = {
-    title: req.body.title,
-    processType: req.body.type,
-    offense: req.body.offense,
-    province: req.body.province,
-    canton: req.body.canton,
-    clientGender: req.body.clientGender,
-    clientAge: req.body.clientAge,
-    processStatus: req.body.status,
-    lastUpdate: req.body.lastUpdate,
-    startDate: req.body.startDate,
-    endDate: req.body.endDate,
-    processNumber: req.body.code,
-    processDescription: req.body.description,
-  };
   try {
+    const updatedProcess = {
+      title: req.body.title,
+      processType: req.body.processType,
+      offense: req.body.offense,
+      province: req.body.province,
+      canton: req.body.canton,
+      clientGender: req.body.clientGender,
+      clientAge: req.body.clientAge,
+      processStatus: req.body.processStatus,
+      lastUpdate: new Date(), // fecha actual
+      startDate: req.body.startDate || undefined, // si no se envía, no modifica
+      endDate: req.body.endDate || null,
+      processNumber: req.body.processNumber,
+      processDescription: req.body.processDescription,
+    };
+
     const update = await process.findOneAndUpdate(
-      { processId: req.params.id },
+      { processId: Number(req.params.id) },
       updatedProcess,
       { new: true }
     );
+
+    if (!update)
+      return res.status(404).json({ message: 'Proceso no encontrado' });
+
     res.status(200).json(update);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -93,29 +98,41 @@ router.put('/process/:id/update', authenticateToken, async (req, res) => {
 // 🔐 Resumen de proceso con eventos y elapsedTime
 router.get('/process/:id/summary', authenticateToken, async (req, res) => {
   try {
-    const processObject = await process.findOne({ processId: req.params.id });
-    if (processObject.processStatus !== 'not started') {
-      const selectionQuery = { name: 1, dateStart: 1, dateEnd: 1 };
-      const processEvents = await event
-        .find({ processId: req.params.id })
-        .sort({ orderIndex: 'asc' })
-        .select(selectionQuery);
+    const processObject = await process.findOne({
+      processId: Number(req.params.id),
+    });
+    if (!processObject)
+      return res.status(404).json({ message: 'Proceso no encontrado' });
 
-      const startDate = processEvents[0].dateStart;
-      const lastDate = processEvents.at(-1).dateEnd ?? new Date().toISOString();
-      const elapsedTime = calculateWeeksMonthsElapsed(startDate, lastDate);
-
-      const processSummary = {
-        processTitle: processObject.title,
-        dateStart: startDate,
-        lastUpdate: lastDate,
-        elapsedTime,
-        eventsList: processEvents,
-      };
-      res.status(200).json(processSummary);
-    } else {
-      res.status(400).json({ message: 'Proceso no iniciado' });
+    if (processObject.processStatus === 'not started') {
+      return res.status(400).json({ message: 'Proceso no iniciado' });
     }
+
+    const selectionQuery = { name: 1, dateStart: 1, dateEnd: 1 };
+    const processEvents = await event
+      .find({ processId: Number(req.params.id) })
+      .sort({ orderIndex: 'asc' })
+      .select(selectionQuery);
+
+    if (processEvents.length === 0) {
+      return res
+        .status(404)
+        .json({ message: 'No hay eventos para este proceso' });
+    }
+
+    const startDate = processEvents[0].dateStart;
+    const lastDate = processEvents.at(-1).dateEnd ?? new Date().toISOString();
+    const elapsedTime = calculateWeeksMonthsElapsed(startDate, lastDate);
+
+    const processSummary = {
+      processTitle: processObject.title,
+      dateStart: startDate,
+      lastUpdate: lastDate,
+      elapsedTime,
+      eventsList: processEvents,
+    };
+
+    res.status(200).json(processSummary);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -129,6 +146,7 @@ function calculateWeeksMonthsElapsed(startDate, endDate) {
   let months = Math.floor(days / 30.44);
   days = Math.floor(days - weeks * 7);
   weeks = Math.floor(weeks - months * 4);
+
   return {
     monthsElapsed: months,
     weeksElapsed: weeks,
@@ -219,10 +237,11 @@ router.get(
   async (req, res) => {
     const { process_id } = req.query;
     try {
-      const result = await process.findOne({ processId: process_id });
-      result
-        ? res.status(200).json(result)
-        : res.status(404).json({ message: 'Proceso no encontrado' });
+      const result = await process.findOne({ processId: Number(process_id) });
+      if (!result) {
+        return res.status(404).json({ message: 'Proceso no encontrado' });
+      }
+      res.status(200).json(result);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
