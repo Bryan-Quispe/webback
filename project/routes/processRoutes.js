@@ -1,12 +1,12 @@
-const express = require("express");
-const process = require("../models/Process");
-const event = require("../models/Event");
-const { authenticateToken } = require("../middleware/authenticateToken"); // Middleware de seguridad
+const express = require('express');
+const process = require('../models/Process');
+const event = require('../models/Event');
+const { authenticateToken } = require('../middleware/authenticateToken'); // Middleware de seguridad
 
 const router = express.Router();
 
 // 🔓 Obtener todos los procesos (libre)
-router.get("/processes", async (req, res) => {
+router.get('/processes', async (req, res) => {
   try {
     const processes = await process.find();
     res.json(processes);
@@ -15,20 +15,27 @@ router.get("/processes", async (req, res) => {
   }
 });
 
-// 🔓 Obtener proceso por ID (libre)
-router.get("/process/:id", async (req, res) => {
+// 🔓 Obtener proceso por processId (libre)
+router.get('/process/:id', async (req, res) => {
   try {
-    const processObject = await process.findOne({ processId: req.params.id });
+    const processId = Number(req.params.id); // 👈 convierte a número
+    if (isNaN(processId)) {
+      return res
+        .status(400)
+        .json({ message: 'El processId debe ser numérico' });
+    }
+
+    const processObject = await process.findOne({ processId });
     processObject
       ? res.status(200).json(processObject)
-      : res.status(404).json({ message: "Proceso no encontrado" });
+      : res.status(404).json({ message: 'Proceso no encontrado' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
 // 🔐 Crear nuevo proceso
-router.post("/process", authenticateToken, async (req, res) => {
+router.post('/process', authenticateToken, async (req, res) => {
   const newProcess = new process({
     processId: req.body.id,
     accountId: req.body.account,
@@ -55,7 +62,7 @@ router.post("/process", authenticateToken, async (req, res) => {
 });
 
 // 🔐 Actualizar proceso
-router.put("/process/:id/update", authenticateToken, async (req, res) => {
+router.put('/process/:id/update', authenticateToken, async (req, res) => {
   const updatedProcess = {
     title: req.body.title,
     processType: req.body.type,
@@ -84,14 +91,14 @@ router.put("/process/:id/update", authenticateToken, async (req, res) => {
 });
 
 // 🔐 Resumen de proceso con eventos y elapsedTime
-router.get("/process/:id/summary", authenticateToken, async (req, res) => {
+router.get('/process/:id/summary', authenticateToken, async (req, res) => {
   try {
     const processObject = await process.findOne({ processId: req.params.id });
-    if (processObject.processStatus !== "not started") {
+    if (processObject.processStatus !== 'not started') {
       const selectionQuery = { name: 1, dateStart: 1, dateEnd: 1 };
       const processEvents = await event
         .find({ processId: req.params.id })
-        .sort({ orderIndex: "asc" })
+        .sort({ orderIndex: 'asc' })
         .select(selectionQuery);
 
       const startDate = processEvents[0].dateStart;
@@ -107,7 +114,7 @@ router.get("/process/:id/summary", authenticateToken, async (req, res) => {
       };
       res.status(200).json(processSummary);
     } else {
-      res.status(400).json({ message: "Proceso no iniciado" });
+      res.status(400).json({ message: 'Proceso no iniciado' });
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -130,31 +137,11 @@ function calculateWeeksMonthsElapsed(startDate, endDate) {
 }
 
 // 🔐 Búsquedas sensibles (protegidas)
-router.get("/processes/searchByTitle", authenticateToken, async (req, res) => {
+router.get('/processes/searchByTitle', authenticateToken, async (req, res) => {
   const { title } = req.query;
   try {
-    const results = await process.find({ title: { $regex: title, $options: "i" } });
-    res.status(200).json(results);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.get("/processes/searchByLastUpdate", authenticateToken, async (req, res) => {
-  const { start_date, end_date } = req.query;
-  if (!start_date || !end_date) {
-    return res.status(400).json({ error: "Se requieren start_date y end_date en el query" });
-  }
-  const start = new Date(start_date);
-  const end = new Date(end_date);
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-    return res
-      .status(400)
-      .json({ error: "Formato de fecha inválido. Usa YYYY-MM-DD o ISO 8601." });
-  }
-  try {
     const results = await process.find({
-      lastUpdate: { $gte: start, $lte: end },
+      title: { $regex: title, $options: 'i' },
     });
     res.status(200).json(results);
   } catch (err) {
@@ -162,17 +149,51 @@ router.get("/processes/searchByLastUpdate", authenticateToken, async (req, res) 
   }
 });
 
-router.get("/processes/searchByProvince", authenticateToken, async (req, res) => {
-  const { province } = req.query;
-  try {
-    const results = await process.find({ province: { $regex: province, $options: "i" } });
-    res.status(200).json(results);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+router.get(
+  '/processes/searchByLastUpdate',
+  authenticateToken,
+  async (req, res) => {
+    const { start_date, end_date } = req.query;
+    if (!start_date || !end_date) {
+      return res
+        .status(400)
+        .json({ error: 'Se requieren start_date y end_date en el query' });
+    }
+    const start = new Date(start_date);
+    const end = new Date(end_date);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(400).json({
+        error: 'Formato de fecha inválido. Usa YYYY-MM-DD o ISO 8601.',
+      });
+    }
+    try {
+      const results = await process.find({
+        lastUpdate: { $gte: start, $lte: end },
+      });
+      res.status(200).json(results);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
-});
+);
 
-router.get("/processes/searchByStatus", authenticateToken, async (req, res) => {
+router.get(
+  '/processes/searchByProvince',
+  authenticateToken,
+  async (req, res) => {
+    const { province } = req.query;
+    try {
+      const results = await process.find({
+        province: { $regex: province, $options: 'i' },
+      });
+      res.status(200).json(results);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+);
+
+router.get('/processes/searchByStatus', authenticateToken, async (req, res) => {
   const { status } = req.query;
   try {
     const results = await process.find({ processStatus: status });
@@ -182,7 +203,7 @@ router.get("/processes/searchByStatus", authenticateToken, async (req, res) => {
   }
 });
 
-router.get("/processes/searchByType", authenticateToken, async (req, res) => {
+router.get('/processes/searchByType', authenticateToken, async (req, res) => {
   const { type } = req.query;
   try {
     const results = await process.find({ processType: type });
@@ -192,16 +213,20 @@ router.get("/processes/searchByType", authenticateToken, async (req, res) => {
   }
 });
 
-router.get("/processes/searchByProcessId", authenticateToken, async (req, res) => {
-  const { process_id } = req.query;
-  try {
-    const result = await process.findOne({ processId: process_id });
-    result
-      ? res.status(200).json(result)
-      : res.status(404).json({ message: "Proceso no encontrado" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+router.get(
+  '/processes/searchByProcessId',
+  authenticateToken,
+  async (req, res) => {
+    const { process_id } = req.query;
+    try {
+      const result = await process.findOne({ processId: process_id });
+      result
+        ? res.status(200).json(result)
+        : res.status(404).json({ message: 'Proceso no encontrado' });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
-});
+);
 
 module.exports = router;
