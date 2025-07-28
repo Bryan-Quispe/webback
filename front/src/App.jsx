@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { BrowserRouter, Outlet, Route, Router, Routes } from 'react-router-dom';
 import Dashboard from './pages/dashboard.jsx'
@@ -14,20 +15,38 @@ import ObservacionesLectura from './pages/lector/ObservacionesLectura.jsx';
 import ProcesoResumen from './pages/lector/ProcesoResumen.jsx';
 import './App.css';
 import ReaderLayout from './pages/lector/readerLayout.jsx';
-
+import CaseDashboard from './lawyer/CaseDashboard.jsx';
+import CaseInfo from './lawyer/CaseInfo.jsx';
+import EventDashboard from './lawyer/EventDashboard.jsx';
+import EvidenceDashboard from './lawyer/EvidenceDashboard.jsx';
+import ObservationDashboard from './lawyer/ObservationDashboard.jsx';
+import PendingCalendar from './lawyer/PendingCalendar.jsx';
+import ReminderList from './lawyer/ReminderList.jsx';
+import AuditList from './lawyer/AuditList.jsx';
+import RelatedCases from './lawyer/RelatedCases.jsx';
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path='/login' element={<LoginLayout />}>
         </Route>
-          <Route path='/lawyer/' element={<LayoutLawyer />}>
-            <Route path='/lawyer/dashboard' element={<Dashboard/>}></Route>
-            <Route path='/lawyer/appointments' element={<Appointments/>}></Route>
-            <Route path='/lawyer/account' element={<AccountData />}></Route>
-          </Route>
+          <Route path="/lawyer" element={<LayoutLawyer />}>
+           <Route path="dashboard" element={<Dashboard />} />
+           <Route path="appointments" element={<Appointments />} />
+           <Route path="account" element={<AccountData />} />
+           <Route path="case-dashboard" element={<CaseDashboard />} />
+           <Route path="case-info/:id" element={<CaseInfo />} />
+           <Route path="event-dashboard/:caseId" element={<EventDashboard />} />
+           <Route path="evidence-dashboard/:caseId" element={<EvidenceDashboard />} />
+           <Route path="observation-dashboard/:caseId" element={<ObservationDashboard />} />
+           <Route path="pending-calendar/:caseId" element={<PendingCalendar />} />
+           <Route path="reminder-list" element={<ReminderList />} />
+           <Route path="audit-list" element={<AuditList />} />
+           <Route path="related-cases/:caseId" element={<RelatedCases />} />
+        </Route>
           <Route path='/unauthorized' element={<LayoutUnauthorized />}></Route>
           <Route path='/' element={<ReaderLayout />}>
+          
             <Route path='/lector' element={<Lector />}></Route>
             <Route
                 path="/lector/proceso/:processId"
