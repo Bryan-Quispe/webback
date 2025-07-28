@@ -28,7 +28,7 @@ export default function LoginElement() {
         localStorage.setItem("token", result.token);
         localStorage.setItem("userId",result.user.accountId);
         alert("Login realizado con exito");
-        window.location.href='/lawyer/';
+        window.location.href='/lawyer/dashboard';
     }
     
       setEmail("");
