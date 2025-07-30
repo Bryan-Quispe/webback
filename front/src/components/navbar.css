@@ -42,3 +42,7 @@
 .accountOptions:active, .accountOptions li:focus, .accountOptions li:active{
     font-weight: bold;
 }
+
+.btn{
+    background-color: var(--color-light-gold);
+}

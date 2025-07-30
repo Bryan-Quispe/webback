@@ -46,7 +46,7 @@ function App() {
             path="pending-calendar/:caseId"
             element={<PendingCalendar />}
           />
-          <Route path="reminder-list" element={<ReminderList />} />
+          <Route path="appointments" element={<ReminderList />} />
           <Route path="audit-list" element={<AuditList />} />
           <Route path="related-cases/:caseId" element={<RelatedCases />} />
         </Route>
