@@ -1,12 +1,45 @@
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const CaseInfo = () => {
+
+  const [isEditing, setIsEditing] = useState(false);
+const [formData, setFormData] = useState(null);
+
+const handleInlineEdit = () => {
+  setFormData(info);
+  setIsEditing(true);
+};
+
+const handleInputChange = (field, value) => {
+  setFormData(prev => ({ ...prev, [field]: value }));
+};
+
+const handleInlineSave = async (e) => {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  try {
+    console.log('caseId:', caseId);
+    await axios.put(`https://webback-x353.onrender.com/legalsystem/process/${caseId}/update`, formData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    setInfo(formData);
+    setIsEditing(false);
+    alert('Proceso actualizado correctamente');
+  } catch (err) {
+    console.error('Error al actualizar proceso:', err);
+    alert('No se pudo actualizar el proceso');
+  }
+};
+
   const { id: caseId } = useParams();
   const {
     handleSetSelected: isCaseSelected, 
     handleSetSelectedId: setCaseId
-  }=useOutletContext();
+  } = useOutletContext();
+
   const navigate = useNavigate();
   const [info, setInfo] = useState(null);
   const [summary, setSummary] = useState(null);
@@ -59,6 +92,25 @@ const CaseInfo = () => {
     fetchInfo();
   }, [caseId]);
 
+  const handleEdit = () => {
+    navigate(`/lawyer/edit-process/${caseId}`);
+  };
+
+  const handleDelete = async () => {
+    const token = localStorage.getItem('token');
+    if (!window.confirm('¿Eliminar este proceso? Esta acción no se puede deshacer.')) return;
+    try {
+      await axios.delete(`https://webback-x353.onrender.com/legalsystem/process/${caseId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert('Proceso eliminado correctamente');
+      navigate('/lawyer/case-dashboard');
+    } catch (err) {
+      console.error('Error al eliminar proceso:', err);
+      alert('Error al eliminar proceso');
+    }
+  };
+
   if (loading) return <p className="text-[#1C2C54]">Cargando información del caso...</p>;
   if (error) return <p className="text-[#6E1E2B]">Error: {error}</p>;
 
@@ -103,33 +155,49 @@ const CaseInfo = () => {
       ) : (
         <p className="text-sm text-[#A0A0A0]">No hay fechas definidas para calcular duración.</p>
       )}
+      {isEditing && (
+  <form onSubmit={handleInlineSave} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-sm text-[#1C2C54]">
+    <input type="text" value={formData.title} onChange={(e) => handleInputChange('title', e.target.value)} className="border p-2 rounded" placeholder="Título" />
+    <input type="text" value={formData.processType} onChange={(e) => handleInputChange('processType', e.target.value)} className="border p-2 rounded" placeholder="Tipo" />
+    <input type="text" value={formData.offense} onChange={(e) => handleInputChange('offense', e.target.value)} className="border p-2 rounded" placeholder="Delito" />
+    <input type="text" value={formData.province} onChange={(e) => handleInputChange('province', e.target.value)} className="border p-2 rounded" placeholder="Provincia" />
+    <input type="text" value={formData.canton} onChange={(e) => handleInputChange('canton', e.target.value)} className="border p-2 rounded" placeholder="Cantón" />
+    <input type="text" value={formData.clientGender} onChange={(e) => handleInputChange('clientGender', e.target.value)} className="border p-2 rounded" placeholder="Género cliente" />
+    <input type="number" value={formData.clientAge} onChange={(e) => handleInputChange('clientAge', e.target.value)} className="border p-2 rounded" placeholder="Edad cliente" />
+    <input type="text" value={formData.processStatus} onChange={(e) => handleInputChange('processStatus', e.target.value)} className="border p-2 rounded" placeholder="Estado" />
+    <input type="date" value={formData.startDate?.slice(0, 10)} onChange={(e) => handleInputChange('startDate', e.target.value)} className="border p-2 rounded" />
+    <input type="date" value={formData.endDate?.slice(0, 10)} onChange={(e) => handleInputChange('endDate', e.target.value)} className="border p-2 rounded" />
+    <input type="text" value={formData.processNumber} onChange={(e) => handleInputChange('processNumber', e.target.value)} className="border p-2 rounded" placeholder="Número de proceso" />
+    <textarea value={formData.processDescription} onChange={(e) => handleInputChange('processDescription', e.target.value)} className="border p-2 rounded col-span-full" placeholder="Descripción" />
+    <div className="flex gap-4 mt-2 col-span-full">
+      <button type="submit" className="px-4 !py-2 !bg-yellow-600 !text-white !rounded hover:!bg-yellow-700 !flex !items-center !gap-2">Guardar</button>
+      <button type="button" onClick={() => setIsEditing(false)} className="px-4 !py-2 !bg-red-700 !text-white !rounded hover:!bg-red-800 !flex !items-center !gap-2"> Cancelar</button>
+    </div>
+  </form>
+)}
+
 
       <hr className="border-t border-[#A0A0A0] my-6" />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-        <button
-          onClick={() => navigate(`/lawyer/event-dashboard/${caseId}`)}
-          className="bg-[#1C2C54] text-white py-2 px-3 rounded hover:bg-[#15213F] transition"
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <button 
+         onClick={handleInlineEdit}
+         className="!px-4 !py-2 !bg-yellow-600 !text-white !rounded hover:!bg-yellow-700 !flex !items-center !gap-2"
         >
-          Eventos
+         ✏️ Editar
         </button>
         <button
-          onClick={() => navigate(`/lawyer/evidence-dashboard/${caseId}`)}
-          className="bg-[#6E1E2B] text-white py-2 px-3 rounded hover:bg-[#591623] transition"
+          onClick={handleDelete}
+          className="!px-4 !py-2 !bg-red-700 !text-white !rounded hover:!bg-red-800 !flex !items-center !gap-2"
         >
-          Evidencias
+          🗑️ Eliminar
         </button>
+
         <button
-          onClick={() => navigate(`/lawyer/observation-dashboard/${caseId}`)}
-          className="bg-[#C9A66B] text-white py-2 px-3 rounded hover:bg-[#B48E56] transition"
+          onClick={() => navigate('/lawyer/case-dashboard')}
+          className="!px-4 !py-2 !bg-indigo-700 !text-white !rounded hover:!bg-indigo-800 !flex !items-center !gap-2"
         >
-          Observaciones
-        </button>
-        <button
-          onClick={() => navigate(`/lawyer/pending-calendar/${caseId}`)}
-          className="bg-[#4CAF50] text-white py-2 px-3 rounded hover:bg-[#3E9E44] transition"
-        >
-          Pendientes
+          ↩️ Volver a dashboard
         </button>
       </div>
     </div>
@@ -137,5 +205,6 @@ const CaseInfo = () => {
 };
 
 export default CaseInfo;
+
 
 
