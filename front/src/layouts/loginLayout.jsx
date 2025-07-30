@@ -3,9 +3,7 @@ import { BrowserRouter, Outlet, Route, Router, Routes } from 'react-router-dom';
 import LoginElement from '../components/loginElement';
 import '../App.css'
 export default function LoginLayout() {
-    function login(){
-        
-    }
+
 
   return (
     <>

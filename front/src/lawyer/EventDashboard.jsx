@@ -1,21 +1,26 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 const EventDashboard = () => {
   const { caseId } = useParams();
+  const {
+    handleSetSelected: isCaseSelected, 
+    handleSetSelectedId: setCaseId
+  }=useOutletContext();
   const [events, setEvents] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
-
+  const baseURI='https://webback-x353.onrender.com/legalsystem';
   useEffect(() => {
     const token = localStorage.getItem('token');
-
+    isCaseSelected(true);
+    setCaseId(caseId);
     const fetchEvents = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/legalsystem/events/searchByProcess/${caseId}`,
+          baseURI+`/events/searchByProcess/${caseId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -48,7 +53,7 @@ const EventDashboard = () => {
     };
 
     try {
-      const res = await fetch('http://localhost:3000/legalsystem/event', {
+      const res = await fetch((baseURI+'/event'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +89,7 @@ const EventDashboard = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`http://localhost:3000/legalsystem/event/update/${eventId}`, {
+      const res = await fetch(baseURI+`/event/update/${eventId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -107,7 +112,7 @@ const EventDashboard = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`http://localhost:3000/legalsystem/events/delete/${eventId}`, {
+      const res = await fetch(baseURI+`/events/delete/${eventId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useState } from 'react'
+import { useState, createContext } from 'react'
 import { BrowserRouter, Outlet, Route, Router, Routes } from 'react-router-dom';
 import NavBarMain from '../components/NavBarMain.jsx';
 import Sidebar from '../components/Sidebar.jsx';
@@ -8,14 +8,24 @@ import '../App.css'
 export default function LayoutLawyer() {
 
     const timeoutRef= useRef(null);
+    const [caseSelected, setCaseSelected]=useState(false);
+    const [selectedCaseId, setSelectedCaseId] =useState(0);
+
+    const handleSetSelected=(state) => setCaseSelected(state);
+    const handleSetSelectedId=(state) => setSelectedCaseId(state);
+    const contextSelectedCase={
+      handleSetSelected,
+      handleSetSelectedId
+    };
 
   useEffect(() => {
     const limit_time = 5 * 60 * 1000;
+    const warning_time = 4.5 * 60 * 1000;
 
     const sessionEnd = () => {
       localStorage.clear();
       alert('Ha estado mucho tiempo inactivo. Su sesión se ha cerrado.');
-      window.location.assign('../'); 
+      window.location.assign('../../login'); 
     };
 
     const restartCount = () => {
@@ -45,9 +55,9 @@ export default function LayoutLawyer() {
     <div className='container flex flex-col min-h-screen'>
       <NavBarMain />
       <div className='flex flex-row flex-1 mr-1'>
-        <Sidebar/>
+        {(caseSelected) ? <Sidebar caseId={selectedCaseId}/> : <div></div> }
         <main className='flex-1 pl-3 overflow-auto'>
-            <Outlet />
+            <Outlet context={contextSelectedCase}/>
         </main>
       </div>
     </div>

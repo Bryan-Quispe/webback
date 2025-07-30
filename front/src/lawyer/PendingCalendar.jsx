@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 // Genera los días del mes actual
 const generateDays = (year, month) => {
   const days = [];
@@ -21,12 +21,17 @@ const generateDays = (year, month) => {
 };
 
 const PendingCalendar = () => {
+  const {
+    handleSetSelected: isCaseSelected, 
+    handleSetSelectedId: setCaseId
+  }=useOutletContext();
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
-
+  const baseURI = 'https://webback-x353.onrender.com/legalsystem';
   const days = generateDays(year, month);
 
+  useEffect(()=>{isCaseSelected(true)});
   // Eventos simulados
   const events = {
     '2025-07-30': 'Reunión con cliente',

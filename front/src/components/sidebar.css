@@ -9,14 +9,19 @@
 .sidebar{
     background-color: #2c437d;
     position: relative;
-    color: var(--color-bone-white);
+}
+
+.sideLink{
+    color: var(--color-bone-white) !important;
 }
 
 .sidebar ul li:hover{
+    color: var(--color-bone-white) !important;
     background-color: #3d589b;
 }
 
 .sidebar ul li{
+    color: var(--color-bone-white) !important;
     padding-top: 5px;
     padding-left: 10px;
     padding-bottom: 5px;

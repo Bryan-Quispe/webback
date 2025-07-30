@@ -1,8 +1,12 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 const EvidenceDashboard = () => {
   const { caseId } = useParams();
+  const {
+    handleSetSelected: isCaseSelected, 
+    handleSetSelectedId: setCaseId
+  }=useOutletContext();
   const [evidences, setEvidences] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
@@ -10,9 +14,12 @@ const EvidenceDashboard = () => {
   const [uploadFile, setUploadFile] = useState(null);
   const [uploadPath, setUploadPath] = useState('');
   const token = localStorage.getItem('token');
+  const baseURI='https://webback-x353.onrender.com/legalsystem';
 
   useEffect(() => {
-    fetch(`http://localhost:3000/legalsystem/evidences/process/${caseId}`)
+    isCaseSelected(true);
+    setCaseId(caseId);
+    fetch(baseURI+`/evidences/process/${caseId}`)
       .then(res => res.json())
       .then(data => setEvidences(data))
       .catch(err => setError(err.message));
@@ -20,7 +27,7 @@ const EvidenceDashboard = () => {
 
   const handleDelete = async (evidenceId) => {
     try {
-      const res = await fetch(`http://localhost:3000/legalsystem/evidence/${evidenceId}`, {
+      const res = await fetch(baseURI+`/evidence/${evidenceId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -47,7 +54,7 @@ const EvidenceDashboard = () => {
 
   const handleUpdate = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/legalsystem/evidence/${editingId}`, {
+      const res = await fetch(baseURI+`/evidence/${editingId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +77,7 @@ const EvidenceDashboard = () => {
     formData.append('file', uploadFile);
 
     try {
-      const res = await fetch('http://localhost:3000/legalsystem/evidence/upload', {
+      const res = await fetch(baseURI+'/evidence/upload', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {useState, useEffect}from 'react';
 import '../App.css'
+import { getAccountData } from '../api/userDataApi';
 import App from '../App';
 
 export default function AccountData()
@@ -11,25 +12,11 @@ export default function AccountData()
     const [phone, setPhone]=useState("");
 
     const handleGetAccountInfo = async () =>{
-        const uri="http://localhost:3000/legalsystem/account/"+localStorage.getItem("userId");
-        const response = await fetch(uri,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
-                }
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || "Failed to add Stand");
-            }
-            else{
-                const result=await response.json();
-                setName(result.name);
-                setLastname(result.lastname);
-                setPhone(result.phoneNumber);
-                setEmail(result.email);
-            }
+        const result=await getAccountData();
+        setName(result.name);
+        setLastname(result.lastname);
+        setPhone(result.phoneNumber);
+        setEmail(result.email);
     }
 
     useEffect(() => {

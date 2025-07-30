@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import * as Icon from 'react-bootstrap-icons';
 import '../App.css';
@@ -10,8 +11,7 @@ import {
   HomeIcon
 } from '@heroicons/react/24/outline'
 
-export default function Sidebar(){
-    
+export default function Sidebar({caseId}){
     const [menuExtended, setMenuExtended]= useState(false);
     const handleOpenMenu = () => setMenuExtended(true);
     const handleCloseMenu = () => setMenuExtended(false);
@@ -20,33 +20,33 @@ export default function Sidebar(){
         <>
         <div className='sidebar flex flex-row w-fit py-1 h-dvh space-y-1'>
             <div>
-                <ul className='' onMouseEnter={handleOpenMenu} onMouseLeave={handleCloseMenu}>
-                    <li className=''>
-                        <Link className='flex flex-row items-center space-x-2 text-decoration-none' to={'/lawyer/processes'}>
+                <ul onMouseEnter={handleOpenMenu} onMouseLeave={handleCloseMenu}>
+                    <li>
+                        <Link className='sideLink flex flex-row items-center space-x-2 text-decoration-none' to={`/lawyer/case-info/${caseId}`}>
                             {(menuExtended)? <Icon.FolderFill className='h-4 w-4 inline-block'/>
                             : <Icon.Folder2Open className='h-4 w-4 inline-block'/>
                             }
                             <p className={`${menuVisibility}`}>Proceso</p>
                         </Link>
                     </li>
-                    <li className=''>
-                        <Link className='flex flex-row items-center space-x-2 text-decoration-none ' to={'/lawyer/events'}>
+                    <li>
+                        <Link className='sideLink flex flex-row items-center space-x-2 text-decoration-none' to={`/lawyer/event-dashboard/${caseId}`}>
                             {(menuExtended)? <Icon.Grid3x2GapFill className='h-4 w-4 inline-block'/>
                             : <Icon.Grid3x2Gap className='h-4 w-4 inline-block'/>
                             }
                             <p className={`${menuVisibility}`}>Eventos</p>
                         </Link>
                     </li>
-                    <li className=''>
-                        <Link className='flex flex-row items-center space-x-2 text-decoration-none ' to={'/lawyer/evidences'}>
+                    <li>
+                        <Link className='sideLink flex flex-row items-center space-x-2 text-decoration-none' to={`/lawyer/evidence-dashboard/${caseId}`}>
                                 {(menuExtended)? <Icon.FileMedicalFill className='h-4 w-4 inline-block'/>
                             : <Icon.FileMedical className='h-4 w-4 inline-block'/>
                             }
                             <p className={`${menuVisibility}`}>Evidencias</p>
                         </Link>
                     </li>
-                    <li className=''>
-                        <Link className='flex flex-row items-center space-x-2 text-decoration-none ' to={'/lawyer/observations'}>
+                    <li>
+                        <Link className='sideLink flex flex-row items-center space-x-2 text-decoration-none' to={`/lawyer/observation-dashboard/${caseId}`}>
                             {(menuExtended)? <Icon.JournalBookmarkFill className='h-4 w-4 inline-block'/>
                             : <Icon.Journal className='h-4 w-4 inline-block'/>
                             }

@@ -1,16 +1,22 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 const ObservationDashboard = () => {
   const { caseId } = useParams();
+  const {
+    handleSetSelected: isCaseSelected, 
+    handleSetSelectedId: setCaseId
+  }=useOutletContext();
   const [observations, setObservations] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ title: '', content: '', eventId: '' });
   const [error, setError] = useState(null);
   const token = localStorage.getItem('token');
-
+  const baseURI = 'https://webback-x353.onrender.com/legalsystem';
   useEffect(() => {
-    fetch(`http://localhost:3000/legalsystem/observations/event/${caseId}`)
+    isCaseSelected(true);
+    setCaseId(caseId);
+    fetch(baseURI+`/observations/event/${caseId}`)
       .then(res => res.json())
       .then(data => setObservations(data))
       .catch(err => setError(err.message));
@@ -20,7 +26,7 @@ const ObservationDashboard = () => {
 
   const handleCreate = async () => {
     try {
-      const res = await fetch('http://localhost:3000/legalsystem/observation', {
+      const res = await fetch('/observation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,7 +50,7 @@ const ObservationDashboard = () => {
 
   const handleUpdate = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/legalsystem/observation/${editingId}`, {
+      const res = await fetch(baseURI+`/observation/${editingId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +69,7 @@ const ObservationDashboard = () => {
 
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/legalsystem/observation/${id}`, {
+      const res = await fetch(baseURI+`/observation/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

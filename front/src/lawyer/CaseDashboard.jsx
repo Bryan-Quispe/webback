@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 
 export default function CaseDashboard() {
+  const {
+    handleSetSelected: isCaseSelected, 
+    handleSetSelectedId: setCaseId
+  }=useOutletContext();
   const [cases, setCases] = useState([]);
   const [filteredCases, setFilteredCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,16 +15,21 @@ export default function CaseDashboard() {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
+  const selectCase = (caseId) =>
+  {
+    isCaseSelected(true);
+    navigate(`/lawyer/case-info/${caseId}`);
+  };
   useEffect(() => {
     if (!token) {
       alert('Debe iniciar sesión');
       navigate('/unauthorized');
       return;
     }
-
+    
     const fetchCases = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/legalsystem/processes', {
+        const res = await axios.get('https://webback-x353.onrender.com/legalsystem/processes', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCases(res.data);
@@ -46,7 +55,7 @@ export default function CaseDashboard() {
 
   const handleCreate = async () => {
     try {
-      const res = await axios.post('http://localhost:3000/legalsystem/process', {
+      const res = await axios.post('https://webback-x353.onrender.com/legalsystem/process', {
         accountId: 1,
         title: 'Nuevo proceso',
         processType: 'judicial',
@@ -75,7 +84,7 @@ export default function CaseDashboard() {
   const handleDelete = async (processId) => {
     if (!window.confirm('¿Eliminar este proceso? Esta acción no se puede deshacer.')) return;
     try {
-      await axios.delete(`http://localhost:3000/legalsystem/process/${processId}`, {
+      await axios.delete(`https://webback-x353.onrender.com/legalsystem/process/${processId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFilteredCases((prev) => prev.filter((p) => p.processId !== processId));
@@ -123,7 +132,7 @@ export default function CaseDashboard() {
 
               <div className="mt-4 flex flex-col gap-2">
                 <button
-                  onClick={() => navigate(`/lawyer/case-info/${c.processId}`)}
+                  onClick={() => selectCase(c.processId)}
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
                   Ver información completa

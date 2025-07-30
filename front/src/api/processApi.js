@@ -1,6 +1,6 @@
 import axios from 'axios';
-const API = 'http://localhost:3000/legalsystem/processes';
-const APIONE = 'http://localhost:3000/legalsystem/process';
+const API = 'https://webback-x353.onrender.com/legalsystem/processes';
+const APIONE = 'https://webback-x353.onrender.com/legalsystem/process';
 
 export const getAllProcesses = async () => {
   try {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllProcesses } from '../../api/processApi';
-import Navbar from '../../components/NavBarMain.jsx';
+import Navbar from '../../components/NavBarReader.jsx';
 
 export default function Lector() {
   const [processes, setProcesses] = useState([]);

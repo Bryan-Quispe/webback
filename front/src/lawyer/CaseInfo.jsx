@@ -1,8 +1,12 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 const CaseInfo = () => {
   const { id: caseId } = useParams();
+  const {
+    handleSetSelected: isCaseSelected, 
+    handleSetSelectedId: setCaseId
+  }=useOutletContext();
   const navigate = useNavigate();
   const [info, setInfo] = useState(null);
   const [summary, setSummary] = useState(null);
@@ -11,10 +15,11 @@ const CaseInfo = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-
+    isCaseSelected(true);
+    setCaseId(Number(caseId));
     const fetchInfo = async () => {
       try {
-        const baseUrl = 'http://localhost:3000/legalsystem';
+        const baseUrl = 'https://webback-x353.onrender.com/legalsystem';
         const headers = { Authorization: `Bearer ${token}` };
 
         const res = await fetch(`${baseUrl}/process/${caseId}`, { headers });

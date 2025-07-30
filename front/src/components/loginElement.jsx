@@ -5,7 +5,7 @@ export default function LoginElement() {
   const [password, setPassword] = useState("");
 
   const handleSendLoginInfo = async () => {
-    const uri="http://localhost:3000/legalsystem/account/login";
+    const uri="https://webback-x353.onrender.com/legalsystem/account/login";
     const response = await fetch(uri,
     {
         method: "POST",

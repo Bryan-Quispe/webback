@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import * as Icon from 'react-bootstrap-icons';
 import '../App.css';
@@ -10,17 +10,25 @@ import {
   CalendarIcon,
   HomeIcon
 } from '@heroicons/react/24/outline'
+import { getAccountData } from '../api/userDataApi';
 import userData from '../testData/userData';
 
 export default function NavBarMain()
 {
-    const [user, SetUser] = useState(userData);
+    const [userName, SetUsername] = useState("");
+    const [userLastname, SetUserLastname] = useState("");
     const [accountClicked, handleAccountOptions] = useState(false);
-    const getUserData = () => SetUser(userData);
     const toggleAccountOptions = () => handleAccountOptions(!accountClicked);
     const closeAccountOptions = () => {
-
+      localStorage.clear();
+      window.location.href='../../login';
     };
+    const handleGetUserData = async () =>{
+      const userData=await getAccountData();
+      SetUsername(userData.name);
+      SetUserLastname(userData.lastname);
+    }
+    useEffect(()=>{handleGetUserData},[]);
     const accountOptionsState = (accountClicked) ? "block" : "hidden";
 
     return (
@@ -31,7 +39,7 @@ export default function NavBarMain()
           <div>
             <img src={LegalLogo} className='h-9 w-9 inline-block' />
           </div>
-          <div className=" font-bold text-x1">{user.name} {user.lastname}</div>
+          <div className=" font-bold text-x1">{userName} {userLastname}</div>
         </div>
         <div className=''>
           <nav>
@@ -60,7 +68,7 @@ export default function NavBarMain()
                       <Link className='text-decoration-none me-3' to={'/lawyer/profile'}>Perfil Publico</Link>
                     </li>
                     <li>
-                      <Link className='text-decoration-none me-3' to={'/lawyer/exit'}>Cerrar Sesion</Link>
+                      <Link className='text-decoration-none me-3' onClick={closeAccountOptions}>Cerrar Sesion</Link>
                     </li>
                   </ul>
               </div>

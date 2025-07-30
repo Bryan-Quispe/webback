@@ -1,15 +1,22 @@
 // lawyer/RelatedCases.jsx
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 
 const RelatedCases = () => {
+  const baseURI = 'https://webback-x353.onrender.com/legalsystem';
   const { caseId } = useParams();
+  const {
+    handleSetSelected: isCaseSelected, 
+    handleSetSelectedId: setCaseId
+  }=useOutletContext();
   const [related, setRelated] = useState([]);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get(`/api/cases/related/${caseId}`, {
+    isCaseSelected(true);
+    setCaseId(caseId);
+    axios.get(baseURI+`/api/cases/related/${caseId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(res => setRelated(res.data))
