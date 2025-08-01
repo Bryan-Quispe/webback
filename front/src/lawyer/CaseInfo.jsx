@@ -139,24 +139,12 @@ const handleInlineSave = async (e) => {
 
       <hr className="border-t border-[#A0A0A0] my-6" />
 
-      <h3 className="text-xl font-semibold text-[#6E1E2B] mb-3">Resumen de eventos</h3>
+      
       {summary ? (
         <>
           <p className="text-sm text-[#1C2C54] mb-2">
             <strong>Duración:</strong> {summary.elapsedTime.monthsElapsed} meses, {summary.elapsedTime.weeksElapsed} semanas, {summary.elapsedTime.daysElapsed} días
           </p>
-          {summary.eventsList.length > 0 ? (
-            <ul className="list-disc list-inside text-sm text-[#1C2C54] space-y-1">
-              {summary.eventsList.map((e, idx) => (
-                <li key={idx}>
-                  <strong>{e.name}</strong> — {new Date(e.dateStart).toLocaleDateString()}
-                  {e.dateEnd && ` → ${new Date(e.dateEnd).toLocaleDateString()}`}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-[#A0A0A0]">No hay eventos registrados aún.</p>
-          )}
         </>
       ) : (
         <p className="text-sm text-[#A0A0A0]">No hay fechas definidas para calcular duración.</p>

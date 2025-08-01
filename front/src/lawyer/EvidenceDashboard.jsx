@@ -1,176 +1,154 @@
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useForm } from 'react-hook-form';
 
-function EventDashboard({ processId, token }) {
-  const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+const API_URL = 'https://webback-x353.onrender.com/legalsystem'; // Ajusta según tu backend
+
+export default function EvidenceDashboard() {
+  const { register, handleSubmit, reset } = useForm();
   const [evidences, setEvidences] = useState([]);
-  const [newEvidence, setNewEvidence] = useState({
-    evidenceType: '',
-    evidenceName: '',
-    file: null,
-  });
-  const [status, setStatus] = useState('');
-  const API_BASE = 'https://webback-x353.onrender.com/legalsystem'; // Ajusta según tu config
+  const [file, setFile] = useState(null);
+  const [token, setToken] = useState(''); // Puedes obtenerlo desde login
 
-  // 🔍 Cargar eventos del proceso
-  useEffect(() => {
-    async function loadEvents() {
-      try {
-        const res = await fetch(`${API_BASE}/evidences/process/${processId}`);
-        const data = await res.json();
-        setEvents(data);
-      } catch (err) {
-        setStatus('Error cargando eventos');
-      }
-    }
-
-    if (processId) loadEvents();
-  }, [processId]);
-
-  // 🔍 Cargar evidencias del evento seleccionado
-  useEffect(() => {
-    async function loadEvidences() {
-      if (!selectedEvent) return;
-      try {
-        const res = await fetch(`${API_BASE}/evidences/event/${selectedEvent.eventId}`);
-        const data = await res.json();
-        setEvidences(data);
-      } catch (err) {
-        setStatus('Error cargando evidencias');
-      }
-    }
-    loadEvidences();
-  }, [selectedEvent]);
-
-  // 📤 Subir archivo
-  async function uploadFile(file) {
+  // Subir archivo y obtener ruta
+  const uploadFile = async () => {
+    if (!file) return '';
     const formData = new FormData();
     formData.append('file', file);
-
-    const res = await fetch(`${API_BASE}/evidence/upload`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
+    const res = await axios.post(`${API_URL}/evidence/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
     });
+    return res.data.filePath;
+  };
 
-    const data = await res.json();
-    return data.filePath;
-  }
-
-  // 📝 Crear nueva evidencia
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setStatus('Creando evidencia...');
-
+  // Crear evidencia
+  const onSubmit = async (data) => {
     try {
-      const filePath = await uploadFile(newEvidence.file);
-
-      const body = {
-        eventId: selectedEvent.eventId,
-        evidenceType: newEvidence.evidenceType,
-        evidenceName: newEvidence.evidenceName,
-        filePath,
-      };
-
-      const res = await fetch(`${API_BASE}/evidence`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
-
-      const saved = await res.json();
-      setStatus('Evidencia creada exitosamente');
-      setNewEvidence({ evidenceType: '', evidenceName: '', file: null });
-      setEvidences([...evidences, saved]);
+      const filePath = await uploadFile();
+      const res = await axios.post(
+        `${API_URL}/evidence`,
+        { ...data, filePath },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert('Evidencia creada');
+      reset();
     } catch (err) {
-      setStatus('Error creando evidencia');
+      console.error(err);
     }
-  }
+  };
+
+  // Obtener por eventId
+  const fetchByEventId = async (eventId) => {
+    const res = await axios.get(`${API_URL}/evidences/event/${eventId}`);
+    setEvidences(res.data);
+  };
+
+  // Obtener por processId
+  const fetchByProcessId = async (processId) => {
+    const res = await axios.get(`${API_URL}/evidences/process/${processId}`);
+    setEvidences(res.data);
+  };
+
+  // Obtener una evidencia
+  const fetchById = async (evidenceId) => {
+    const res = await axios.get(`${API_URL}/evidence/${evidenceId}`);
+    setEvidences([res.data]);
+  };
+
+  // Actualizar evidencia
+  const updateEvidence = async (id, updateData) => {
+    const res = await axios.put(`${API_URL}/evidence/${id}`, updateData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    alert('Actualizado');
+  };
+
+  // Eliminar evidencia
+  const deleteEvidence = async (id) => {
+    await axios.delete(`${API_URL}/evidence/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    alert('Eliminado');
+    setEvidences(evidences.filter((e) => e.evidenceId !== id));
+  };
 
   return (
-    <div className="p-4 text-white-900">
-      <h2 className="text-2xl font-bold mb-4">Panel de Eventos y Evidencias</h2>
+    <div className="p-4 space-y-4">
+      <h1 className="text-xl font-bold">Gestión de Evidencias</h1>
 
-      {/* 🗂️ Selector de Evento */}
-      <select
-        onChange={(e) => {
-          const index = e.target.selectedIndex;
-          setSelectedEvent(events[index]);
-          setStatus('');
-        }}
-        className="mb-4 p-2 border rounded text-white-900"
-      >
-        <option>Selecciona un evento</option>
-        {events.map((ev) => (
-          <option key={ev.eventId}>
-            #{ev.eventId} — {ev.eventName}
-          </option>
-        ))}
-      </select>
+      <input
+        className="border px-2 py-1 w-full"
+        placeholder="Token de autenticación"
+        onChange={(e) => setToken(e.target.value)}
+      />
 
-      {/* 📋 Lista de evidencias */}
-      {selectedEvent && (
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold mb-2">Evidencias de {selectedEvent.eventName}</h3>
-          <ul className="space-y-3">
-            {evidences.map((ev) => (
-              <li key={ev.evidenceId} className="p-3 border rounded shadow bg-white">
-                <strong>{ev.evidenceName}</strong> ({ev.evidenceType})
-                <br />
-                {ev.filePath && (
-                  <a
-                    href={`${API_BASE}/${ev.filePath}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-700 underline"
-                  >
-                    Ver archivo
-                  </a>
-                )}
-              </li>
-            ))}
-            {evidences.length === 0 && <p className="text-gray-500">No hay evidencias para este evento.</p>}
-          </ul>
-        </div>
-      )}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-2 border p-4">
+        <h2 className="font-semibold">Crear Evidencia</h2>
+        <input {...register('eventId')} placeholder="eventId" className="border px-2 py-1 w-full" />
+        <input {...register('evidenceType')} placeholder="evidenceType" className="border px-2 py-1 w-full" />
+        <input {...register('evidenceName')} placeholder="evidenceName" className="border px-2 py-1 w-full" />
+        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+        <button className="bg-blue-500 text-white px-4 py-1 rounded" type="submit">Crear</button>
+      </form>
 
-      {/* 🆕 Formulario de nueva evidencia */}
-      {selectedEvent && (
-        <form onSubmit={handleSubmit} className="bg-gray-50 p-4 rounded border space-y-3">
-          <h4 className="text-lg font-semibold">Agregar nueva evidencia</h4>
-          <input
-            type="text"
-            placeholder="Nombre de la evidencia"
-            value={newEvidence.evidenceName}
-            onChange={(e) => setNewEvidence({ ...newEvidence, evidenceName: e.target.value })}
-            className="block w-full p-2 border rounded text-blue-900"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Tipo de evidencia"
-            value={newEvidence.evidenceType}
-            onChange={(e) => setNewEvidence({ ...newEvidence, evidenceType: e.target.value })}
-            className="block w-full p-2 border rounded text-blue-900"
-            required
-          />
-          <input
-            type="file"
-            onChange={(e) => setNewEvidence({ ...newEvidence, file: e.target.files[0] })}
-            className="block w-full p-2 text-blue-900"
-            required
-          />
-          <button type="submit" className="bg-blue-700 text-white px-4 py-2 rounded">
-            Subir Evidencia
-          </button>
-          {status && <p className="mt-2 text-sm text-gray-700">{status}</p>}
-        </form>
-      )}
+      <div className="space-y-2">
+        <h2 className="font-semibold">Buscar Evidencias</h2>
+        <input
+          placeholder="Buscar por evidenceId"
+          className="border px-2 py-1 w-full"
+          onKeyDown={(e) => e.key === 'Enter' && fetchById(e.target.value)}
+        />
+        <input
+          placeholder="Buscar por eventId"
+          className="border px-2 py-1 w-full"
+          onKeyDown={(e) => e.key === 'Enter' && fetchByEventId(e.target.value)}
+        />
+        <input
+          placeholder="Buscar por processId"
+          className="border px-2 py-1 w-full"
+          onKeyDown={(e) => e.key === 'Enter' && fetchByProcessId(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <h2 className="font-semibold">Resultados</h2>
+        {evidences.length === 0 && <p>No hay evidencias</p>}
+        <ul className="space-y-2">
+          {evidences.map((evidence) => (
+            <li key={evidence.evidenceId} className="border p-2 rounded">
+              <p><strong>ID:</strong> {evidence.evidenceId}</p>
+              <p><strong>Nombre:</strong> {evidence.evidenceName}</p>
+              <p><strong>Tipo:</strong> {evidence.evidenceType}</p>
+              <p><strong>Archivo:</strong> {evidence.filePath}</p>
+
+              <button
+                className="bg-red-500 text-white px-2 py-1 mr-2 mt-2 rounded"
+                onClick={() => deleteEvidence(evidence.evidenceId)}
+              >
+                Eliminar
+              </button>
+
+              <button
+                className="bg-yellow-500 text-white px-2 py-1 mt-2 rounded"
+                onClick={() =>
+                  updateEvidence(evidence.evidenceId, {
+                    evidenceName: prompt('Nuevo nombre'),
+                  })
+                }
+              >
+                Actualizar
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
 
-export default EventDashboard;
+
