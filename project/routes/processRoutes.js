@@ -167,6 +167,21 @@ router.get('/processes/searchByTitle', authenticateToken, async (req, res) => {
   }
 });
 
+router.delete('/process/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deleted = await Process.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Proceso no encontrado' });
+    }
+    res.status(200).json({ message: 'Proceso eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar el proceso:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+});
+
 router.get(
   '/processes/searchByLastUpdate',
   authenticateToken,
