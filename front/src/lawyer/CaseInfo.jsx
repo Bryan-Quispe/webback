@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import './lawyerFunctions.css';
 
 const CaseInfo = () => {
   const { id: caseId } = useParams();
@@ -63,8 +64,8 @@ const CaseInfo = () => {
   if (error) return <p className="text-[#6E1E2B]">Error: {error}</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-[#F9F9F6] shadow-md rounded-lg border border-[#A0A0A0]">
-      <h2 className="text-3xl font-bold mb-6 text-[#1C2C54]">{info.title}</h2>
+    <div className="bg-bone-white max-w-4xl mx-auto mt-3 p-6 shadow-md rounded-lg border border-[#A0A0A0]">
+      <h2 className="text-3xl font-bold mb-6 text-regal-blue">{info.title}</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-8 text-sm text-[#1C2C54] mb-6">
         <p><strong>ID:</strong> {info.processId}</p>

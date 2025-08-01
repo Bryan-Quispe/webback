@@ -45,7 +45,7 @@ export default function NavBarMain()
           <nav>
             <ul className='flex flex-row space-x-3'>
               <li>
-                <Link className="navLink text-bone-white me-3 text-decoration-none" to={'/lawyer/dashboard'}>
+                <Link className="navLink flex items-center text-bone-white me-3 text-decoration-none" to={'/lawyer/dashboard'}>
               <HomeIcon className='inline-block h-4 w-4'/>Inicio
             </Link>
               </li>

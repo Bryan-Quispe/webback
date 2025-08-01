@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+
+@theme{
+    --color-bone-white: #F9F9F6;
+    --color-regal-blue: #1C2C54;
+    --color-light-gold: #C9A66B;
+}
+
+.card{
+    background-color: #162241ea;
+    color: var(--color-bone-white);
+}

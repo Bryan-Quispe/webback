@@ -1,6 +1,8 @@
 import { useEffect, useState, } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import axios from 'axios';
+import './lawyerFunctions.css';
+import * as Icon from 'react-bootstrap-icons';
 
 export default function CaseDashboard() {
   const {
@@ -21,6 +23,7 @@ export default function CaseDashboard() {
     navigate(`/lawyer/case-info/${caseId}`);
   };
   useEffect(() => {
+    isCaseSelected(false);
     if (!token) {
       alert('Debe iniciar sesión');
       navigate('/unauthorized');
@@ -96,7 +99,8 @@ export default function CaseDashboard() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">📂 Panel de Casos</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        <Icon.Folder2Open className='h-10/12 inline-block'/>     Mis casos</h1>
 
       <button
         onClick={handleCreate}
@@ -122,7 +126,7 @@ export default function CaseDashboard() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredCases.map((c) => (
-            <div key={c.processId} className="bg-white border rounded-lg p-4 shadow">
+            <div key={c.processId} className="card  rounded-lg p-4 shadow">
               <h2 className="text-lg font-semibold">{c.title}</h2>
               <p><strong>ID:</strong> {c.processId}</p>
               <p><strong>Estado:</strong> {c.processStatus}</p>

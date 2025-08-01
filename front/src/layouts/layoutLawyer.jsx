@@ -52,7 +52,7 @@ export default function LayoutLawyer() {
   else{
     return (
     <>
-    <div className='container flex flex-col min-h-screen'>
+    <div className='container flex flex-col min-h-screen min-w-screen'>
       <NavBarMain />
       <div className='flex flex-row flex-1 mr-1'>
         {(caseSelected) ? <Sidebar caseId={selectedCaseId}/> : <div></div> }
