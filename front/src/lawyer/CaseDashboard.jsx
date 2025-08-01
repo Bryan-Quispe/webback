@@ -6,79 +6,63 @@ import * as Icon from 'react-bootstrap-icons';
 
 export default function CaseDashboard() {
   const {
-    handleSetSelected: isCaseSelected,
-    handleSetSelectedId: setCaseId,
-  } = useOutletContext();
-
+    handleSetSelected: isCaseSelected, 
+    handleSetSelectedId: setCaseId
+  }=useOutletContext();
   const [cases, setCases] = useState([]);
   const [filteredCases, setFilteredCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({ status: '', type: '', province: '' });
-  const [dates, setDates] = useState({ start: '', end: '' });
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
-  const baseURL = 'https://webback-x353.onrender.com/legalsystem';
-
-  const provincias = [
-    'Azuay', 'Bolívar', 'Cañar', 'Carchi', 'Chimborazo', 'Cotopaxi', 'El Oro',
-    'Esmeraldas', 'Galápagos', 'Guayas', 'Imbabura', 'Loja', 'Los Ríos',
-    'Manabí', 'Morona Santiago', 'Napo', 'Orellana', 'Pastaza', 'Pichincha',
-    'Santa Elena', 'Santo Domingo de los Tsáchilas', 'Sucumbíos', 'Tungurahua',
-    'Zamora Chinchipe',
-  ];
-  const tiposProceso = ['civil', 'penal', 'laboral', 'administrativo'];
-  const estadosProceso = ['no iniciado', 'en curso', 'terminado'];
-  const selectCase = (caseId) => {
+  const selectCase = (caseId) =>
+  {
     isCaseSelected(true);
     navigate(`/lawyer/case-info/${caseId}`);
   };
-
-  const fetchAllCases = async () => {
-    try {
-      const res = await axios.get(`${baseURL}/processes`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCases(res.data);
-      setFilteredCases(res.data);
-    } catch (error) {
-      console.error('Error al obtener procesos:', error);
-      setErrorMsg('Hubo un problema al cargar los procesos.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    isCaseSelected(false);
     if (!token) {
       alert('Debe iniciar sesión');
       navigate('/unauthorized');
       return;
     }
-    isCaseSelected(false);
-    fetchAllCases();
+    
+    const fetchCases = async () => {
+      try {
+        const res = await axios.get('https://webback-x353.onrender.com/legalsystem/processes', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setCases(res.data);
+        setFilteredCases(res.data);
+      } catch (error) {
+        console.error('Error al obtener procesos:', error);
+        setErrorMsg('Hubo un problema al cargar los procesos.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCases();
   }, [navigate, token]);
 
-  const handleSearchTitle = async (term) => {
+  const handleSearch = (term) => {
     setSearchTerm(term);
-    try {
-      const res = await axios.get(`${baseURL}/processes/searchByTitle?title=${term}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setFilteredCases(res.data);
-    } catch (err) {
-      console.error('Error al buscar por título:', err);
-    }
+    const filtered = cases.filter((c) =>
+      c.title.toLowerCase().includes(term.toLowerCase())
+    );
+    setFilteredCases(filtered);
   };
 
+ 
   const applyFilters = async () => {
     try {
       if (filters.status) {
         const res = await axios.get(`${baseURL}/processes/searchByStatus?status=${filters.status}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        headers: { Authorization: `Bearer ${token}` },
+      });
         setFilteredCases(res.data);
       }
       if (filters.type) {
@@ -117,16 +101,16 @@ export default function CaseDashboard() {
 
       <button
         onClick={handleCreate}
-        className="mb-6 px-4 py-2 !bg-blue-700 !text-white !rounded hover:!bg-blue-800"
+        className="mb-6 px-4 py-2 bg-[#1C2C54] text-white rounded hover:bg-[#15213F]"
       >
         ➕ Crear nuevo proceso
       </button>
 
       <div className="mb-4 flex flex-col md:flex-row md:items-end gap-4">
-        <input
-          type="text"
-          placeholder="🔍 Buscar por título..."
-          value={searchTerm}
+      <input
+        type="text"
+        placeholder="🔍 Buscar por título..."
+        value={searchTerm}
           onChange={(e) => handleSearchTitle(e.target.value)}
           className="p-2 rounded border border-gray-600 bg-gray-800 text-white w-full md:max-w-xs placeholder-gray-400"
         />
@@ -207,6 +191,7 @@ export default function CaseDashboard() {
     </div>
   );
 }
+
 
 
 

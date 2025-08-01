@@ -2,6 +2,7 @@ import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import './lawyerFunctions.css';
 import axios from 'axios';
+import axios from 'axios';
 
 const CaseInfo = () => {
 
