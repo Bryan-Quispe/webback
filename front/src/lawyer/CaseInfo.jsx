@@ -2,7 +2,6 @@ import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import './lawyerFunctions.css';
 import axios from 'axios';
-import axios from 'axios';
 
 const CaseInfo = () => {
 
@@ -13,6 +12,11 @@ const handleInlineEdit = () => {
   setFormData(info);
   setIsEditing(true);
 };
+
+const selectCase = (caseId) => {
+    isCaseSelected(true);
+    navigate(`/lawyer/case-event/${caseId}`);
+  };
 
 const handleInputChange = (field, value) => {
   setFormData(prev => ({ ...prev, [field]: value }));
@@ -200,6 +204,13 @@ const handleInlineSave = async (e) => {
           className="!px-4 !py-2 !bg-indigo-700 !text-white !rounded hover:!bg-indigo-800 !flex !items-center !gap-2"
         >
           ↩️ Volver a dashboard
+        </button>
+
+        <button
+          onClick={() => navigate(`/lawyer/event-dashboard/${caseId}`)}
+          className="!px-4 !py-2 !bg-indigo-700 !text-white !rounded hover:!bg-indigo-800 !flex !items-center !gap-2"
+        >
+          ↩️ eventos
         </button>
       </div>
     </div>

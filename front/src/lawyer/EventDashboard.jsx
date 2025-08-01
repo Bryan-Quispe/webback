@@ -136,14 +136,14 @@ const EventDashboard = () => {
       ) : (
         <ul className="space-y-4">
           {events.map((event) => (
-            <li key={event.eventId} className="p-4 bg-white border-l-4 border-[#1C2C54] rounded shadow-sm">
+            <li key={event.eventId} className="!p-4 !bg-blue !border-l-4 !border-[#1C2C54] !rounded shadow-sm">
               {editingId === event.eventId ? (
                 <>
                   <input name="name" value={editForm.name} onChange={handleEditChange} className="block mb-1" />
-                  <textarea name="description" value={editForm.description} onChange={handleEditChange} className="block mb-1" />
-                  <input name="orderIndex" type="number" value={editForm.orderIndex} onChange={handleEditChange} className="block mb-1" />
-                  <input name="dateStart" type="datetime-local" value={editForm.dateStart} onChange={handleEditChange} className="block mb-1" />
-                  <input name="dateEnd" type="datetime-local" value={editForm.dateEnd} onChange={handleEditChange} className="block mb-1" />
+                  <textarea name="description" value={editForm.description} onChange={handleEditChange} className="block w-full px-3 py-2 text-blue-900 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2" />
+                  <input name="orderIndex" type="number" value={editForm.orderIndex} onChange={handleEditChange} className="block w-full px-3 py-2 border text-blue-900 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2" />
+                  <input name="dateStart" type="datetime-local" value={editForm.dateStart} onChange={handleEditChange} className="block w-full px-3 py-2 border  text-blue-900 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2" />
+                  <input name="dateEnd" type="datetime-local" value={editForm.dateEnd} onChange={handleEditChange} className="block w-full px-3 py-2 border border-gray-300 text-blue-900 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2" />
 
                   <div className="mt-2 flex gap-2">
                     <button

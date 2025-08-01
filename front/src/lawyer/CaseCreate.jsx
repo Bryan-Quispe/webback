@@ -203,7 +203,7 @@ export default function CaseCreate() {
           type="submit"
           className="!px-4 !py-2 !bg-indigo-600 !text-white !rounded hover:!bg-indigo-700 !flex !items-center !gap-2"
         >
-          🚀 Crear proceso
+          Crear proceso
         </button>
       </form>
     </div>
