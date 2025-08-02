@@ -36,14 +36,8 @@ function App() {
           <Route path="case-info/:id" element={<CaseInfo />} />
           <Route path="event-dashboard/:caseId" element={<EventDashboard />} />
           <Route path="create-case" element={<CaseCreate />} /> 
-          <Route
-            path="evidence-dashboard/:caseId"
-            element={<EvidenceDashboard />}
-          />
-          <Route
-            path="observation-dashboard/:caseId"
-            element={<ObservationDashboard />}
-          />
+          <Route path="evidences/:eventId" element={<EvidenceDashboard />} />
+          <Route path="observations/:eventId" element={<ObservationDashboard />} />
           <Route
             path="pending-calendar/:caseId"
             element={<PendingCalendar />}

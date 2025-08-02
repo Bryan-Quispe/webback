@@ -1,154 +1,195 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useForm } from 'react-hook-form';
+import { ArrowLeft, Trash2, Edit } from 'lucide-react';
 
-const API_URL = 'https://webback-x353.onrender.com/legalsystem'; // Ajusta según tu backend
-
-export default function EvidenceDashboard() {
-  const { register, handleSubmit, reset } = useForm();
+const EvidenceDashboard = () => {
+  const { eventId } = useParams();
+  const navigate = useNavigate();
   const [evidences, setEvidences] = useState([]);
-  const [file, setFile] = useState(null);
-  const [token, setToken] = useState(''); // Puedes obtenerlo desde login
+  const [formData, setFormData] = useState({
+    evidenceType: '',
+    evidenceName: '',
+    filePath: '',
+  });
+  const [editingId, setEditingId] = useState(null);
+  const token = localStorage.getItem('token');
 
-  // Subir archivo y obtener ruta
-  const uploadFile = async () => {
-    if (!file) return '';
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await axios.post(`${API_URL}/evidence/upload`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return res.data.filePath;
-  };
+  useEffect(() => {
+    axios
+      .get(`https://webback-x353.onrender.com/legalsystem/evidences/event/${eventId}`)
+      .then((res) => setEvidences(res.data))
+      .catch((err) => console.error('Error al obtener evidencias', err));
+  }, [eventId]);
 
-  // Crear evidencia
-  const onSubmit = async (data) => {
-    try {
-      const filePath = await uploadFile();
-      const res = await axios.post(
-        `${API_URL}/evidence`,
-        { ...data, filePath },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      alert('Evidencia creada');
-      reset();
-    } catch (err) {
-      console.error(err);
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, filePath: file.name });
     }
   };
 
-  // Obtener por eventId
-  const fetchByEventId = async (eventId) => {
-    const res = await axios.get(`${API_URL}/evidences/event/${eventId}`);
-    setEvidences(res.data);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Obtener por processId
-  const fetchByProcessId = async (processId) => {
-    const res = await axios.get(`${API_URL}/evidences/process/${processId}`);
-    setEvidences(res.data);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const payload = { ...formData, eventId: Number(eventId) };
+
+    try {
+      if (editingId) {
+        await axios.put(
+          `https://webback-x353.onrender.com/legalsystem/evidence/${editingId}`,
+          payload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setEvidences((prev) =>
+          prev.map((ev) =>
+            ev.evidenceId === editingId ? { ...ev, ...payload } : ev
+          )
+        );
+      } else {
+        const res = await axios.post(
+          `https://webback-x353.onrender.com/legalsystem/evidence`,
+          payload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setEvidences((prev) => [...prev, res.data]);
+      }
+
+      setFormData({ evidenceType: '', evidenceName: '', filePath: '' });
+      setEditingId(null);
+    } catch (err) {
+      console.error('Error al guardar evidencia', err);
+    }
+    window.location.reload();
+
   };
 
-  // Obtener una evidencia
-  const fetchById = async (evidenceId) => {
-    const res = await axios.get(`${API_URL}/evidence/${evidenceId}`);
-    setEvidences([res.data]);
-  };
-
-  // Actualizar evidencia
-  const updateEvidence = async (id, updateData) => {
-    const res = await axios.put(`${API_URL}/evidence/${id}`, updateData, {
-      headers: { Authorization: `Bearer ${token}` },
+  const handleEdit = (evidence) => {
+    setFormData({
+      evidenceType: evidence.evidenceType,
+      evidenceName: evidence.evidenceName,
+      filePath: evidence.filePath,
     });
-    alert('Actualizado');
+    setEditingId(evidence.evidenceId);
+
   };
 
-  // Eliminar evidencia
-  const deleteEvidence = async (id) => {
-    await axios.delete(`${API_URL}/evidence/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    alert('Eliminado');
-    setEvidences(evidences.filter((e) => e.evidenceId !== id));
+  const handleDelete = async (evidenceId) => {
+    try {
+      await axios.delete(
+        `https://webback-x353.onrender.com/legalsystem/evidence/${evidenceId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEvidences((prev) => prev.filter((ev) => ev.evidenceId !== evidenceId));
+    } catch (err) {
+      console.error('Error al eliminar evidencia', err);
+    }
+  };
+
+  const goBack = () => {
+    navigate(-1);
   };
 
   return (
-    <div className="p-4 space-y-4">
-      <h1 className="text-xl font-bold">Gestión de Evidencias</h1>
-
-      <input
-        className="border px-2 py-1 w-full"
-        placeholder="Token de autenticación"
-        onChange={(e) => setToken(e.target.value)}
-      />
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-2 border p-4">
-        <h2 className="font-semibold">Crear Evidencia</h2>
-        <input {...register('eventId')} placeholder="eventId" className="border px-2 py-1 w-full" />
-        <input {...register('evidenceType')} placeholder="evidenceType" className="border px-2 py-1 w-full" />
-        <input {...register('evidenceName')} placeholder="evidenceName" className="border px-2 py-1 w-full" />
-        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-        <button className="bg-blue-500 text-white px-4 py-1 rounded" type="submit">Crear</button>
-      </form>
-
-      <div className="space-y-2">
-        <h2 className="font-semibold">Buscar Evidencias</h2>
-        <input
-          placeholder="Buscar por evidenceId"
-          className="border px-2 py-1 w-full"
-          onKeyDown={(e) => e.key === 'Enter' && fetchById(e.target.value)}
-        />
-        <input
-          placeholder="Buscar por eventId"
-          className="border px-2 py-1 w-full"
-          onKeyDown={(e) => e.key === 'Enter' && fetchByEventId(e.target.value)}
-        />
-        <input
-          placeholder="Buscar por processId"
-          className="border px-2 py-1 w-full"
-          onKeyDown={(e) => e.key === 'Enter' && fetchByProcessId(e.target.value)}
-        />
+    <div className="max-w-4xl mx-auto p-6 bg-[#1C2C54] rounded-xl shadow-md border border-gray-200">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-white-800">Evidencias del Evento #{eventId}</h2>
+        <button
+          onClick={goBack}
+          className="flex items-center gap-2 text-white-600 hover:text-blue-800"
+        >
+          <ArrowLeft size={20} />
+          Volver a eventos
+        </button>
       </div>
 
-      <div>
-        <h2 className="font-semibold">Resultados</h2>
-        {evidences.length === 0 && <p>No hay evidencias</p>}
-        <ul className="space-y-2">
-          {evidences.map((evidence) => (
-            <li key={evidence.evidenceId} className="border p-2 rounded">
-              <p><strong>ID:</strong> {evidence.evidenceId}</p>
-              <p><strong>Nombre:</strong> {evidence.evidenceName}</p>
-              <p><strong>Tipo:</strong> {evidence.evidenceType}</p>
-              <p><strong>Archivo:</strong> {evidence.filePath}</p>
+      <form onSubmit={handleSubmit} className="bg-gray-50 p-4 text-[#1C2C54] rounded-lg space-y-4 border border-gray-300 mb-8">
+        <input
+          type="text"
+          name="evidenceType"
+          placeholder="Tipo de evidencia"
+          value={formData.evidenceType}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="text"
+          name="evidenceName"
+          placeholder="Nombre de evidencia"
+          value={formData.evidenceName}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="file"
+          onChange={handleFileSelect}
+          className="w-full p-2 border rounded"
+        />
+        <button
+          type="submit"
+          className="bg-[#1C2C54]  hover:bg-blue-700 text-white px-4 py-2 rounded shadow"
+        >
+          {editingId ? 'Actualizar evidencia' : 'Agregar evidencia'}
+        </button>
+      </form>
 
-              <button
-                className="bg-red-500 text-white px-2 py-1 mr-2 mt-2 rounded"
-                onClick={() => deleteEvidence(evidence.evidenceId)}
-              >
-                Eliminar
-              </button>
-
-              <button
-                className="bg-yellow-500 text-white px-2 py-1 mt-2 rounded"
-                onClick={() =>
-                  updateEvidence(evidence.evidenceId, {
-                    evidenceName: prompt('Nuevo nombre'),
-                  })
-                }
-              >
-                Actualizar
-              </button>
+      {evidences.length === 0 ? (
+        <p className="text-gray-500">No hay evidencias registradas.</p>
+      ) : (
+        <ul className="space-y-4">
+          {evidences.map((ev) => (
+            <li
+              key={ev.evidenceId}
+              className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 flex justify-between items-start"
+            >
+              <div>
+                <p className="font-semibold text-gray-700">{ev.evidenceName}</p>
+                <p className="text-sm text-gray-700"><strong>Tipo:</strong> {ev.evidenceType}</p>
+                <p className="text-sm text-gray-700"><strong>Archivo:</strong> {ev.filePath}</p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleEdit(ev)}
+                  className="bg-yellow-400 hover:bg-yellow-500 px-3 py-1 rounded flex items-center gap-1 text-sm"
+                >
+                  <Edit size={16} />
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(ev.evidenceId)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded flex items-center gap-1 text-sm"
+                >
+                  <Trash2 size={16} />
+                  Eliminar
+                </button>
+              </div>
             </li>
           ))}
         </ul>
-      </div>
+      )}
     </div>
   );
-}
+};
+
+export default EvidenceDashboard;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

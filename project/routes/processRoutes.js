@@ -263,4 +263,27 @@ router.get(
   }
 );
 
+// DELETE /process/:id
+router.delete('/process/:id', authenticateToken, async (req, res) => {
+  try {
+    const processId = Number(req.params.id);
+    if (isNaN(processId)) {
+      return res.status(400).json({ message: 'El processId debe ser numérico' });
+    }
+
+    // Busca y elimina por processId (no _id)
+    const deleted = await process.findOneAndDelete({ processId });
+    if (!deleted) {
+      return res.status(404).json({ message: 'Proceso no encontrado' });
+    }
+
+    res.status(200).json({ message: 'Proceso eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar el proceso:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+});
+
+
+
 module.exports = router;

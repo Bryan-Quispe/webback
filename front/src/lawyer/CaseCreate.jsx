@@ -25,7 +25,6 @@ export default function CaseCreate() {
   const token = localStorage.getItem('token');
 
   const [formData, setFormData] = useState({
-    accountId: '',
     title: '',
     offense: '',
     canton: '',
@@ -34,7 +33,7 @@ export default function CaseCreate() {
     clientGender: '',
     clientAge: '',
     processStatus: '',
-    processNumber: generateProcessNumber(), // ← Generación aquí
+    processNumber: generateProcessNumber(),
     processDescription: '',
   });
 
@@ -43,7 +42,6 @@ export default function CaseCreate() {
   const validate = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Título requerido';
-    if (!formData.accountId) newErrors.accountId = 'ID de cuenta requerido';
     if (!formData.processType) newErrors.processType = 'Tipo requerido';
     if (!formData.processStatus) newErrors.processStatus = 'Estado requerido';
     if (!formData.province) newErrors.province = 'Provincia requerida';
@@ -55,7 +53,7 @@ export default function CaseCreate() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'accountId' || name === 'clientAge' ? Number(value) : value,
+      [name]: name === 'clientAge' ? Number(value) : value,
     }));
   };
 
@@ -64,18 +62,24 @@ export default function CaseCreate() {
     if (!validate()) return;
 
     try {
-      const res = await axios.post('https://webback-x353.onrender.com/legalsystem/process', {
-        ...formData,
-        endDate: null,
-        lastUpdate: null,
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // Aquí el accountId fijo en 1 para pruebas
+      const res = await axios.post(
+        'https://webback-x353.onrender.com/legalsystem/process',
+        {
+          ...formData,
+          accountId: 1,  // <- hardcodeado aquí
+          endDate: null,
+          lastUpdate: null,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       navigate(`/lawyer/case-info/${res.data.processId}`);
     } catch (err) {
-      console.error('Error al crear proceso:', err);
-      alert('Error al crear proceso');
+      console.error('Error al crear proceso:', err.response?.data || err.message);
+      alert('Error al crear proceso: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -84,7 +88,6 @@ export default function CaseCreate() {
       <h1 className="text-3xl font-bold mb-6">📝 Crear nuevo proceso</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-        {/* Campo de texto */}
         {[
           { label: 'Título', name: 'title' },
           { label: 'Delito', name: 'offense' },
@@ -104,7 +107,6 @@ export default function CaseCreate() {
           </div>
         ))}
 
-        {/* Número de proceso autogenerado y no editable */}
         <div>
           <label className="block font-semibold mb-1">Número de Proceso</label>
           <input
@@ -116,25 +118,17 @@ export default function CaseCreate() {
           />
         </div>
 
-        {/* Números */}
-        {[
-          { label: 'Edad del Cliente', name: 'clientAge' },
-          { label: 'ID de Cuenta', name: 'accountId' },
-        ].map(({ label, name }) => (
-          <div key={name}>
-            <label className="block font-semibold mb-1">{label}</label>
-            <input
-              type="number"
-              name={name}
-              value={formData[name]}
-              onChange={handleChange}
-              className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
-            />
-            {errors[name] && <p className="text-red-500 text-sm mt-1">{errors[name]}</p>}
-          </div>
-        ))}
+        <div>
+          <label className="block font-semibold mb-1">Edad del Cliente</label>
+          <input
+            type="number"
+            name="clientAge"
+            value={formData.clientAge}
+            onChange={handleChange}
+            className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
+          />
+        </div>
 
-        {/* Selects */}
         <div>
           <label className="block font-semibold mb-1">Tipo de Proceso</label>
           <select
@@ -145,7 +139,9 @@ export default function CaseCreate() {
           >
             <option value="">Seleccione...</option>
             {tiposProceso.map((tipo) => (
-              <option key={tipo} value={tipo}>{tipo}</option>
+              <option key={tipo} value={tipo}>
+                {tipo}
+              </option>
             ))}
           </select>
           {errors.processType && <p className="text-red-500 text-sm mt-1">{errors.processType}</p>}
@@ -161,7 +157,9 @@ export default function CaseCreate() {
           >
             <option value="">Seleccione...</option>
             {provincias.map((prov) => (
-              <option key={prov} value={prov}>{prov}</option>
+              <option key={prov} value={prov}>
+                {prov}
+              </option>
             ))}
           </select>
           {errors.province && <p className="text-red-500 text-sm mt-1">{errors.province}</p>}
@@ -177,7 +175,9 @@ export default function CaseCreate() {
           >
             <option value="">Seleccione...</option>
             {estadosProceso.map((estado) => (
-              <option key={estado} value={estado}>{estado}</option>
+              <option key={estado} value={estado}>
+                {estado}
+              </option>
             ))}
           </select>
           {errors.processStatus && <p className="text-red-500 text-sm mt-1">{errors.processStatus}</p>}
@@ -193,12 +193,13 @@ export default function CaseCreate() {
           >
             <option value="">Seleccione...</option>
             {generos.map((gen) => (
-              <option key={gen} value={gen}>{gen}</option>
+              <option key={gen} value={gen}>
+                {gen}
+              </option>
             ))}
           </select>
         </div>
 
-        {/* Botón */}
         <button
           type="submit"
           className="!px-4 !py-2 !bg-indigo-600 !text-white !rounded hover:!bg-indigo-700 !flex !items-center !gap-2"
@@ -209,5 +210,10 @@ export default function CaseCreate() {
     </div>
   );
 }
+
+
+
+
+
 
 
