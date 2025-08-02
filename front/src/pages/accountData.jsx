@@ -3,10 +3,12 @@ import {useState, useEffect}from 'react';
 import '../App.css'
 import { getAccountData, updateAccountData } from '../api/userDataApi';
 import * as Icons from 'react-bootstrap-icons';
+import { useAlert } from '../components/alerts/alertElement';
 import App from '../App';
 
 export default function AccountData()
 {
+    const {showAlert}=useAlert();
     const [name, setName]=useState("");
     const [lastname, setLastname]=useState("");
     const [email, setEmail]=useState("");
@@ -36,11 +38,11 @@ export default function AccountData()
         if(updatedData!=null)
         {
             console.log('Data updated successfully');
-            alert('Actualizado con exito');
+            showAlert('Actualizado con exito', 'success');
         }
         else{
             console.log('Fail to update');
-            alert('Error al actualizar');
+            showAlert('Error al actualizar', 'error');
         }
         handleGetAccountInfo();
         handleCloseEdit();

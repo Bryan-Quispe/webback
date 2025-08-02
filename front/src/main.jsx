@@ -3,9 +3,12 @@ import { createRoot } from 'react-dom/client';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
+import { AlertProvider } from './components/alerts/alertElement.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <AlertProvider>
+      <App />
+    </AlertProvider>
   </StrictMode>
 );

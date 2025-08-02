@@ -1,6 +1,9 @@
+import React from 'react';
 import { useState } from 'react';
+import { useAlert } from './alerts/alertElement';
 
 export default function LoginElement() {
+  const {showAlert}=useAlert();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,15 +22,13 @@ export default function LoginElement() {
     if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.detail || "Failed to login");
-                console.log("Wrong username or password");
-                alert("Login fallido");
     }
     else
     {
+        showAlert('Ingreso realizado con exito','success');
         const result=await response.json();
         localStorage.setItem("token", result.token);
         localStorage.setItem("userId",result.user.accountId);
-        alert("Login realizado con exito");
         window.location.href='/lawyer/dashboard';
     }
     

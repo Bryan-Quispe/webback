@@ -159,7 +159,7 @@ const CaseInfo = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         <button onClick={handleInlineEdit} className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">✏️ Editar</button>
         <button onClick={handleDelete} className="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-800">🗑️ Eliminar</button>
-        <button onClick={() => navigate('/lawyer/case-dashboard')} className="bg-indigo-700 text-white px-4 py-2 rounded hover:bg-indigo-800">↩️ Volver al dashboard</button>
+        <button onClick={() => navigate('/lawyer/dashboard')} className="bg-indigo-700 text-white px-4 py-2 rounded hover:bg-indigo-800">↩️ Volver al dashboard</button>
         <button onClick={() => navigate(`/lawyer/event-dashboard/${caseId}`)} className="bg-indigo-700 text-white px-4 py-2 rounded hover:bg-indigo-800">📅 Ver eventos</button>
       </div>
     </div>

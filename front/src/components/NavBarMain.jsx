@@ -36,7 +36,9 @@ export default function NavBarMain()
       <div className="flex justify-between items-center">
         <div className='flex flex-row items-center space-x-1 ps-3'>
           <div>
-            <img src={LegalLogo} className='h-9 w-9 inline-block' />
+            <Link to={'/lawyer/dashboard'}>
+            <img src={LegalLogo} className='h-9 w-9 inline-block hover:cursor-pointer'/>
+            </Link>
           </div>
           <div className=" font-bold text-x1">{userName} {userLastname}</div>
         </div>

@@ -9,12 +9,12 @@ export default function ReaderLayout()
 
     return (
         <>
-            <div className="min-h-screen bg-blue-950 text-white py-10 px-4">
+            <div className="min-h-screen bg-blue-950 text-white pt-6 pb-0.5 px-4">
               <Navbar />
                 <main>
                     <Outlet />
                 </main>
-                <footer>
+                <footer className='relative bottom-0'>
                     <ReaderFooter/>
                 </footer>
             </div>

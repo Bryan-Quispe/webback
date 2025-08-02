@@ -30,7 +30,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginLayout />}></Route>
         <Route path="/lawyer" element={<LayoutLawyer />}>
-          <Route path="case-dashboard" element={<CaseDashboard />} />
+          <Route path="dashboard" element={<CaseDashboard />} />
           <Route path="appointments" element={<Appointments />} />
           <Route path="account" element={<AccountData />} />
           <Route path="case-info/:id" element={<CaseInfo />} />
@@ -42,12 +42,14 @@ function App() {
             path="pending-calendar/:caseId"
             element={<PendingCalendar />}
           />
-          <Route path="appointments" element={<ReminderList />} />
+          <Route path="reminders" element={<ReminderList />} />
           <Route path="audit-list" element={<AuditList />} />
           <Route path="related-cases/:caseId" element={<RelatedCases />} />
         </Route>
         <Route path="/unauthorized" element={<LayoutUnauthorized />}></Route>
-        <Route path="/" element={<Lector />}>
+        <Route path="/" element={<ReaderLayout />}>
+          <Route index={true} element={<Lector/>}></Route>
+          <Route path='/lector' element={<Lector/>}></Route>
           <Route
             path="/lector/proceso/:processId"
             element={<ProcesoResumen />}

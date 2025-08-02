@@ -7,6 +7,8 @@ import { getAccountData, getProfileData } from '../api/mainLawyerData';
 
 export default function ReaderFooter()
 {
+
+    /*
     const [lawyerName,setLawyerName]=useState('');
     const [lawyerTitle,setLawyerTitle]=useState('');
     const [lawyerPhone,setLawyerPhone]=useState('');
@@ -23,7 +25,7 @@ export default function ReaderFooter()
         setLawyerAddress(profileData.address);
     };
 
-    useEffect(()=>{handleGetFooterData()},[]);
+    useEffect(()=>{handleGetFooterData()},[]);*/
 
     
 

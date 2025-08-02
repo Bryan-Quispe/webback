@@ -2,12 +2,13 @@ import { useEffect, useRef } from 'react';
 import { useState, createContext } from 'react'
 import { BrowserRouter, Outlet, Route, Router, Routes } from 'react-router-dom';
 import NavBarMain from '../components/NavBarMain.jsx';
-import Sidebar from '../components/Sidebar.jsx';
+import { useAlert } from '../components/alerts/alertElement.jsx';
 import LawyerFooter from '../components/LawyerFooter.jsx';
 import '../App.css'
+import CaseNavBar from '../components/NavBarCase.jsx';
 
 export default function LayoutLawyer() {
-
+    const {showAlert}=useAlert();
     const timeoutRef= useRef(null);
     const [caseSelected, setCaseSelected]=useState(false);
     const [selectedCaseId, setSelectedCaseId] =useState(0);
@@ -25,7 +26,7 @@ export default function LayoutLawyer() {
 
     const sessionEnd = () => {
       localStorage.clear();
-      alert('Ha estado mucho tiempo inactivo. Su sesión se ha cerrado.');
+      showAlert('Ha estado mucho tiempo inactivo. Su sesión se ha cerrado.', 'info');
       window.location.assign('../../login'); 
     };
 
@@ -55,12 +56,10 @@ export default function LayoutLawyer() {
     <>
     <div className='container flex flex-col min-h-screen min-w-screen'>
       <NavBarMain />
-      <div className='flex flex-row flex-1 mr-1'>
-        {(caseSelected) ? <Sidebar caseId={selectedCaseId}/> : <div></div> }
-        <main className='flex-1 pl-3 overflow-auto'>
+        {(caseSelected) ? <CaseNavBar caseId={selectedCaseId}/> : <div></div> }
+        <main className='pt-5 overflow-auto min-h-screen '>
             <Outlet context={contextSelectedCase}/>
         </main>
-      </div>
       <footer className='relative bottom-0'>
           <LawyerFooter/>
         </footer>
