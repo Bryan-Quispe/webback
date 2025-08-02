@@ -1,10 +1,10 @@
-const ACCOUNT = 'https://webback-x353.onrender.com/legalsystem/account/';
-const PROFILE = 'https://webback-x353.onrender.com//legalsystem/profile/';
+const ACCOUNT = 'http://localhost:3000/legalsystem/account/';
+const PROFILE = 'https://webback-x353.onrender.com/legalsystem/profile/';
 
-const userId=localStorage.getItem("userId") ?? 1;
+const userId=localStorage.getItem("userId") ?? 15;
 
 export const getAccountData = async () =>{
-        const uri=ACCOUNT+userId;
+        const uri=ACCOUNT+userId+'/public';
         const response = await fetch(uri,
             {
                 headers: {
@@ -23,7 +23,7 @@ export const getAccountData = async () =>{
     }
 
 export const getProfileData = async () =>{
-        const uri=PROFILE+userId;
+        const uri=PROFILE+1;
         const response = await fetch(uri,
             {
                 headers: {

@@ -24,6 +24,21 @@ router.get('/account/:id', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/account/:id/public', async (req, res) => {
+  try {
+    const accounts = await account.findOne({ accountId: req.params.id });
+    const fullData={
+      name: accounts.name,
+      lastname: accounts.lastname,
+      phoneNumber: accounts.phoneNumber,
+      email: accounts.email
+    }
+    res.status(200).json(fullData);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 router.put('/accounts/update/:id', authenticateToken, async (req, res) => {
   const updatedAccount = {
     name: req.body.name,

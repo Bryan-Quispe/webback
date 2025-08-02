@@ -1,13 +1,10 @@
 import { useState } from 'react';
 import { BrowserRouter, Outlet, Route, Router, Routes } from 'react-router-dom';
-import Dashboard from './pages/dashboard.jsx';
-import Appointments from './pages/appointments.jsx';
 import LoginLayout from './layouts/loginLayout.jsx';
 import './App.css';
 import LayoutLawyer from './layouts/layoutLawyer.jsx';
 import LayoutUnauthorized from './layouts/layoutUnauthorized.jsx';
 import AccountData from './pages/accountData.jsx';
-import NavBarMain from './components/NavBarMain.jsx';
 import EvidenciasLectura from './pages/lector/EvidenciasLectura.jsx';
 import Lector from './pages/lector/Lector.jsx';
 import ObservacionesLectura from './pages/lector/ObservacionesLectura.jsx';
@@ -31,7 +28,6 @@ function App() {
         <Route path="/login" element={<LoginLayout />}></Route>
         <Route path="/lawyer" element={<LayoutLawyer />}>
           <Route path="dashboard" element={<CaseDashboard />} />
-          <Route path="appointments" element={<Appointments />} />
           <Route path="account" element={<AccountData />} />
           <Route path="case-info/:id" element={<CaseInfo />} />
           <Route path="event-dashboard/:caseId" element={<EventDashboard />} />

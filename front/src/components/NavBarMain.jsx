@@ -32,7 +32,7 @@ export default function NavBarMain()
 
     return (
     <>
-      <header className="navbar text-zinc-900 py-3 px-3 shadow-sm w-screen z-20">
+      <header className="navbar text-zinc-900 py-3 px-3 shadow-sm w-full z-20">
       <div className="flex justify-between items-center">
         <div className='flex flex-row items-center space-x-1 ps-3'>
           <div>
@@ -55,8 +55,8 @@ export default function NavBarMain()
               <Icon.Bell className='inline-block h-4 w-4'/>Recordatorios
             </Link>
             </li>
-            <li id="accountButton" className="navLink text-bone-white me-3 text-decoration-none" onClick={toggleAccountOptions}>
-              <UserCircleIcon className='inline-block h-6 w-6'/>
+            <li id="accountButton" className="navLink text-bone-white me-3 text-decoration-none hover:cursor-pointer" onClick={toggleAccountOptions}>
+              <UserCircleIcon className='inline-block h-7 w-7'/>
               <div className={`bg-bone-white ${accountOptionsState} absolute rounded-sm shadow-lg w-fit  mx-2 text-right right-0 mt-3 z-10}`}>
                   <ul className='accountOptions rounded-sm shadow-lg'>
                     <li>

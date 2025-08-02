@@ -12,7 +12,7 @@ export function AlertProvider({children}){
     const [alert, setAlert] = useState({ message: '', type: 'info', visible: false });
     const timerRef = useRef(null);
 
-    const showAlert = (message, type, duration = 3000) => {
+    const showAlert = (message, type, duration = 5000) => {
         setAlert({ message, type, visible: true });
 
     clearTimeout(timerRef.current);

@@ -8,7 +8,7 @@ import { getAccountData, getProfileData } from '../api/mainLawyerData';
 export default function ReaderFooter()
 {
 
-    /*
+    
     const [lawyerName,setLawyerName]=useState('');
     const [lawyerTitle,setLawyerTitle]=useState('');
     const [lawyerPhone,setLawyerPhone]=useState('');
@@ -25,7 +25,7 @@ export default function ReaderFooter()
         setLawyerAddress(profileData.address);
     };
 
-    useEffect(()=>{handleGetFooterData()},[]);*/
+    useEffect(()=>{handleGetFooterData()},[]);
 
     
 
@@ -35,21 +35,21 @@ export default function ReaderFooter()
 
         <div className="text-center md:text-left">
           <p className="text-sm">
-            <strong>Abog. Luz Romero</strong>
+            <strong>Abog. {lawyerName}</strong>
             </p>
-          <p className="text-sm">Abogada independiente y defensora de los derechos</p>
+          <p className="text-sm">{lawyerTitle}</p>
         </div>
 
         <div className="text-center md:text-left">
             <p className='text-sm font-bold'>Información de Contacto:</p>
             <p className="text-sm">
-                <strong>Celular:</strong>0987654321
+                <strong>Celular:</strong>{lawyerPhone}
             </p>
             <p className="text-sm">
-                <strong>Correo:</strong>luzromero@gmail.com
+                <strong>Correo:</strong>{lawyerMail}
             </p>
             <p className="text-sm">
-                <strong>Dirección: </strong>Calle A interseccion B
+                <strong>Dirección: </strong>{lawyerAddress}
             </p>
         </div>
 
