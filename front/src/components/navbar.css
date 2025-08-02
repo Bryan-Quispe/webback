@@ -32,7 +32,7 @@
 
 .accountOptions
 {
-    background-color: #A0A0A0;
+    background-color: #ececec;
     color: #424242;
 }
 
@@ -46,3 +46,4 @@
 .btn{
     background-color: var(--color-light-gold);
 }
+

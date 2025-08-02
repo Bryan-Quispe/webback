@@ -1,17 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
-import NavBarMain from '../../components/NavBarMain';
+import Navbar from '../../components/NavBarReader.jsx';
+import ReaderFooter from '../../components/readerFooter.jsx';
+
 import '../../App.css'
 export default function ReaderLayout()
 {
 
     return (
         <>
-        <div className="bg-primario text-fondoClaro min-h-screen flex flex-col">
-              <NavBarMain />
-                <main className="flex-1 p-4">
+            <div className="min-h-screen bg-blue-950 text-white py-10 px-4">
+              <Navbar />
+                <main>
                     <Outlet />
                 </main>
+                <footer>
+                    <ReaderFooter/>
+                </footer>
             </div>
         </>
     );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import '../App.css';
 
 export default function ReminderList() {
   const [reminders, setReminders] = useState([]);
@@ -11,7 +12,7 @@ export default function ReminderList() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    isCaseSelected(true);
+    isCaseSelected(false);
     if (!token) {
       alert('Debe iniciar sesión');
       navigate('/unauthorized');
@@ -56,14 +57,14 @@ export default function ReminderList() {
           {reminders.map((r) => (
             <div
               key={r.id}
-              className="bg-white border rounded-lg p-4 shadow hover:shadow-md transition"
+              className="bg-regal-blue border text-bone-white rounded-lg p-4 shadow hover:shadow-md transition"
             >
-              <h2 className="text-lg font-semibold text-[#6E1E2B]">{r.title}</h2>
+              <h2 className="text-lg font-semibold text-[#c3384f]">{r.title}</h2>
               <p><strong>Descripción:</strong> {r.description}</p>
               <p><strong>Fecha límite:</strong> {new Date(r.dueDate).toLocaleString('es-EC')}</p>
-              <p>
+              <p className={`border rounded-sm p-2 ${(r.status=="pendiente")? 'border-yellow-500' : 'border-green-500' }` }>
                 <strong>Estado:</strong>{' '}
-                <span className={r.status === 'pendiente' ? 'text-yellow-700' : 'text-green-700'}>
+                <span className={r.status === 'pendiente' ? 'text-yellow-500' : 'text-green-500'}>
                   {r.status}
                 </span>
               </p>

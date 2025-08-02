@@ -53,6 +53,14 @@ export default function Sidebar({caseId}){
                             <p className={`${menuVisibility}`}>Observaciones</p>
                         </Link>
                     </li>
+                    <li>
+                        <Link className='sideLink flex flex-row items-center space-x-2 text-decoration-none' to={`/lawyer/pending-calendar/${caseId}`}>
+                            {(menuExtended)? <Icon.Calendar2Event className='h-4 w-4 inline-block'/>
+                            : <Icon.Calendar2Check className='h-4 w-4 inline-block'/>
+                            }
+                            <p className={`${menuVisibility}`}>Pendientes</p>
+                        </Link>
+                    </li>
                 </ul>
             </div>
         </div>

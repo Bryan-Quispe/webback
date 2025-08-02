@@ -3,6 +3,7 @@ import { useState, createContext } from 'react'
 import { BrowserRouter, Outlet, Route, Router, Routes } from 'react-router-dom';
 import NavBarMain from '../components/NavBarMain.jsx';
 import Sidebar from '../components/Sidebar.jsx';
+import LawyerFooter from '../components/LawyerFooter.jsx';
 import '../App.css'
 
 export default function LayoutLawyer() {
@@ -60,6 +61,9 @@ export default function LayoutLawyer() {
             <Outlet context={contextSelectedCase}/>
         </main>
       </div>
+      <footer className='relative bottom-0'>
+          <LawyerFooter/>
+        </footer>
     </div>
     </>
   );

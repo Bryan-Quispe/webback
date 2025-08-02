@@ -14,19 +14,16 @@ import {
 export default function NavBarReader()
 {
   const navigate = useNavigate();
-    const goToLogin = () => {
-
-    }
     return (
     <>
-      <header className="navbar text-zinc-900 py-3 px-3 shadow-sm w-screen z-20">
+      <header className="navbar text-zinc-900 py-3 px-3 shadow-sm w-full z-20">
       <div className="flex justify-between items-center">
         <div className='flex flex-row items-center font-bold text-white'>
             <img src={LegalLogo} className='h-9 w-9 inline-block' />
             Case Library
           </div>
           <div>
-            <button className='flex btn items-center text-black rounded-2xl'
+            <button className='flex btn items-center text-black rounded py-1 px-1'
               onClick={()=>{navigate(`/login`);}}
             >
               Iniciar Sesión

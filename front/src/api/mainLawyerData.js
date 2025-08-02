@@ -1,12 +1,10 @@
-const BASEURI='https://webback-x353.onrender.com/legalsystem';
-const ACCOUNT = '/account/';
-const accountUpdate='/accounts/update/';
-const PROFILE = '/profile/';
+const ACCOUNT = 'https://webback-x353.onrender.com/legalsystem/account/';
+const PROFILE = 'https://webback-x353.onrender.com//legalsystem/profile/';
 
-const userId=localStorage.getItem("userId") ?? 0;
+const userId=localStorage.getItem("userId") ?? 1;
 
 export const getAccountData = async () =>{
-        const uri=BASEURI+ACCOUNT+userId;
+        const uri=ACCOUNT+userId;
         const response = await fetch(uri,
             {
                 headers: {
@@ -25,7 +23,7 @@ export const getAccountData = async () =>{
     }
 
 export const getProfileData = async () =>{
-        const uri=BASEURI+PROFILE+userId;
+        const uri=PROFILE+userId;
         const response = await fetch(uri,
             {
                 headers: {
@@ -42,26 +40,3 @@ export const getProfileData = async () =>{
                 return result;
             }
     }
-
-export const updateAccountData = async (data) =>{
-    const uri=BASEURI+accountUpdate+userId;
-    console.log("Recieved data");
-    console.log(data);
-    const response = await fetch(uri,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
-                },
-                body: JSON.stringify(data)
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || "Failed to update Account data");
-            }
-            else{
-                const result=await response.json();
-                return result;
-            }
-}
