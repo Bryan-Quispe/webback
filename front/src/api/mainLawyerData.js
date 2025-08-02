@@ -1,4 +1,4 @@
-const ACCOUNT = 'http://localhost:3000/legalsystem/account/';
+const ACCOUNT = 'https://webback-x353.onrender.com/legalsystem/account/';
 const PROFILE = 'https://webback-x353.onrender.com/legalsystem/profile/';
 
 const userId=localStorage.getItem("userId") ?? 15;
