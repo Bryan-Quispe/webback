@@ -1,179 +1,173 @@
-import { useParams, useOutletContext } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { ArrowLeft, Trash2, Edit } from 'lucide-react';
 
 const EvidenceDashboard = () => {
-  const { caseId } = useParams();
-  const {
-    handleSetSelected: isCaseSelected, 
-    handleSetSelectedId: setCaseId
-  }=useOutletContext();
+  const { eventId } = useParams();
+  const navigate = useNavigate();
   const [evidences, setEvidences] = useState([]);
+  const [formData, setFormData] = useState({
+    evidenceType: '',
+    evidenceName: '',
+    filePath: '',
+  });
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({});
-  const [error, setError] = useState(null);
-  const [uploadFile, setUploadFile] = useState(null);
-  const [uploadPath, setUploadPath] = useState('');
   const token = localStorage.getItem('token');
-  const baseURI='https://webback-x353.onrender.com/legalsystem';
 
   useEffect(() => {
-    isCaseSelected(true);
-    setCaseId(caseId);
-    fetch(baseURI+`/evidences/process/${caseId}`)
-      .then(res => res.json())
-      .then(data => setEvidences(data))
-      .catch(err => setError(err.message));
-  }, [caseId]);
+    axios
+      .get(`https://webback-x353.onrender.com/legalsystem/evidences/event/${eventId}`)
+      .then((res) => setEvidences(res.data))
+      .catch((err) => console.error('Error al obtener evidencias', err));
+  }, [eventId]);
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, filePath: file.name });
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const payload = { ...formData, eventId: Number(eventId) };
+
+    try {
+      if (editingId) {
+        await axios.put(
+          `https://webback-x353.onrender.com/legalsystem/evidence/${editingId}`,
+          payload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setEvidences((prev) =>
+          prev.map((ev) =>
+            ev.evidenceId === editingId ? { ...ev, ...payload } : ev
+          )
+        );
+      } else {
+        const res = await axios.post(
+          `https://webback-x353.onrender.com/legalsystem/evidence`,
+          payload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setEvidences((prev) => [...prev, res.data]);
+      }
+
+      setFormData({ evidenceType: '', evidenceName: '', filePath: '' });
+      setEditingId(null);
+    } catch (err) {
+      console.error('Error al guardar evidencia', err);
+    }
+    window.location.reload();
+
+  };
+
+  const handleEdit = (evidence) => {
+    setFormData({
+      evidenceType: evidence.evidenceType,
+      evidenceName: evidence.evidenceName,
+      filePath: evidence.filePath,
+    });
+    setEditingId(evidence.evidenceId);
+
+  };
 
   const handleDelete = async (evidenceId) => {
     try {
-      const res = await fetch(baseURI+`/evidence/${evidenceId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('No se pudo eliminar evidencia');
-      setEvidences(prev => prev.filter(ev => ev.evidenceId !== evidenceId));
+      await axios.delete(
+        `https://webback-x353.onrender.com/legalsystem/evidence/${evidenceId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEvidences((prev) => prev.filter((ev) => ev.evidenceId !== evidenceId));
     } catch (err) {
-      setError(`Error: ${err.message}`);
+      console.error('Error al eliminar evidencia', err);
     }
   };
 
-  const handleEditToggle = (ev) => {
-    setEditingId(ev.evidenceId);
-    setEditForm({
-      evidenceType: ev.evidenceType,
-      evidenceName: ev.evidenceName,
-      filePath: ev.filePath,
-      eventId: ev.eventId
-    });
-  };
-
-  const handleEditChange = (e) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
-  };
-
-  const handleUpdate = async () => {
-    try {
-      const res = await fetch(baseURI+`/evidence/${editingId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(editForm)
-      });
-
-      if (!res.ok) throw new Error('Error al actualizar evidencia');
-      const updated = await res.json();
-      setEvidences(prev => prev.map(ev => ev.evidenceId === editingId ? updated : ev));
-      setEditingId(null);
-    } catch (err) {
-      setError(`Error: ${err.message}`);
-    }
-  };
-
-  const handleUpload = async () => {
-    const formData = new FormData();
-    formData.append('file', uploadFile);
-
-    try {
-      const res = await fetch(baseURI+'/evidence/upload', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData
-      });
-
-      if (!res.ok) throw new Error('Error al subir archivo');
-      const { filePath } = await res.json();
-      setUploadPath(filePath);
-      alert('Archivo subido con éxito');
-    } catch (err) {
-      setError(`Error: ${err.message}`);
-    }
+  const goBack = () => {
+    navigate(-1);
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-[#F9F9F6] border border-[#A0A0A0] rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-[#1C2C54]">🧾 Evidencias del proceso #{caseId}</h2>
-
-      {error && <p className="text-[#6E1E2B]">{error}</p>}
-
-      {/* Subida de archivo */}
-      <div className="mb-4">
-        <input type="file" onChange={e => setUploadFile(e.target.files[0])} className="mb-2" />
+    <div className="max-w-4xl mx-auto p-6 bg-[#1C2C54] rounded-xl shadow-md border border-gray-200">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-white-800">Evidencias del Evento #{eventId}</h2>
         <button
-          onClick={handleUpload}
-          className="bg-[#1C2C54] text-white px-4 py-2 rounded shadow-sm"
+          onClick={goBack}
+          className="flex items-center gap-2 text-white-600 hover:text-blue-800"
         >
-          📤 Subir Archivo
+          <ArrowLeft size={20} />
+          Volver a eventos
         </button>
-        {uploadPath && <p className="text-sm text-[#A0A0A0] mt-2">Archivo guardado en: {uploadPath}</p>}
       </div>
 
+      <form onSubmit={handleSubmit} className="bg-gray-50 p-4 text-[#1C2C54] rounded-lg space-y-4 border border-gray-300 mb-8">
+        <input
+          type="text"
+          name="evidenceType"
+          placeholder="Tipo de evidencia"
+          value={formData.evidenceType}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="text"
+          name="evidenceName"
+          placeholder="Nombre de evidencia"
+          value={formData.evidenceName}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="file"
+          onChange={handleFileSelect}
+          className="w-full p-2 border rounded"
+        />
+        <button
+          type="submit"
+          className="bg-[#1C2C54]  hover:bg-blue-700 text-white px-4 py-2 rounded shadow"
+        >
+          {editingId ? 'Actualizar evidencia' : 'Agregar evidencia'}
+        </button>
+      </form>
+
       {evidences.length === 0 ? (
-        <p className="text-[#A0A0A0] text-sm">No hay evidencias registradas para este proceso.</p>
+        <p className="text-gray-500">No hay evidencias registradas.</p>
       ) : (
         <ul className="space-y-4">
           {evidences.map((ev) => (
-            <li key={ev.evidenceId} className="p-4 bg-white border-l-4 border-[#1C2C54] rounded shadow-sm">
-              {editingId === ev.evidenceId ? (
-                <>
-                  <input
-                    name="evidenceName"
-                    value={editForm.evidenceName}
-                    onChange={handleEditChange}
-                    className="block mb-1 border px-2 py-1 w-full"
-                  />
-                  <input
-                    name="evidenceType"
-                    value={editForm.evidenceType}
-                    onChange={handleEditChange}
-                    className="block mb-1 border px-2 py-1 w-full"
-                  />
-                  <input
-                    name="filePath"
-                    value={editForm.filePath}
-                    onChange={handleEditChange}
-                    className="block mb-1 border px-2 py-1 w-full"
-                  />
-                  <div className="mt-2 flex gap-2">
-                    <button
-                      onClick={handleUpdate}
-                      className="bg-[#1C2C54] text-white px-3 py-1 rounded"
-                    >
-                      Guardar
-                    </button>
-                    <button
-                      onClick={() => setEditingId(null)}
-                      className="bg-gray-500 text-white px-3 py-1 rounded"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h3 className="text-lg font-semibold text-[#6E1E2B]">{ev.evidenceName}</h3>
-                  <p className="text-sm text-[#1C2C54]">Tipo: {ev.evidenceType}</p>
-                  <p className="text-xs text-[#A0A0A0]">Ruta: {ev.filePath}</p>
-                  <p className="text-xs text-[#C9A66B]">Evento: {ev.eventId}</p>
-
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      onClick={() => handleEditToggle(ev)}
-                      className="bg-[#1C2C54] text-white py-1 px-2 rounded text-sm"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDelete(ev.evidenceId)}
-                      className="bg-[#6E1E2B] text-white py-1 px-2 rounded text-sm"
-                    >
-                      Borrar
-                    </button>
-                  </div>
-                </>
-              )}
+            <li
+              key={ev.evidenceId}
+              className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 flex justify-between items-start"
+            >
+              <div>
+                <p className="font-semibold text-gray-700">{ev.evidenceName}</p>
+                <p className="text-sm text-gray-700"><strong>Tipo:</strong> {ev.evidenceType}</p>
+                <p className="text-sm text-gray-700"><strong>Archivo:</strong> {ev.filePath}</p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleEdit(ev)}
+                  className="bg-yellow-400 hover:bg-yellow-500 px-3 py-1 rounded flex items-center gap-1 text-sm"
+                >
+                  <Edit size={16} />
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(ev.evidenceId)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded flex items-center gap-1 text-sm"
+                >
+                  <Trash2 size={16} />
+                  Eliminar
+                </button>
+              </div>
             </li>
           ))}
         </ul>
@@ -183,4 +177,19 @@ const EvidenceDashboard = () => {
 };
 
 export default EvidenceDashboard;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

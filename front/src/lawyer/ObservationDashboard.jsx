@@ -1,56 +1,58 @@
-import { useParams, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Trash2, Edit } from 'lucide-react';
 
 const ObservationDashboard = () => {
-  const { caseId } = useParams();
-  const {
-    handleSetSelected: isCaseSelected, 
-    handleSetSelectedId: setCaseId
-  }=useOutletContext();
+  const { eventId } = useParams();
+  const navigate = useNavigate();
   const [observations, setObservations] = useState([]);
+  const [form, setForm] = useState({ title: '', content: '' });
   const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState({ title: '', content: '', eventId: '' });
-  const [error, setError] = useState(null);
-  const token = localStorage.getItem('token');
+  const [error, setError] = useState('');
   const baseURI = 'https://webback-x353.onrender.com/legalsystem';
+  const token = localStorage.getItem('token');
+
   useEffect(() => {
-    isCaseSelected(true);
-    setCaseId(caseId);
-    fetch(baseURI+`/observations/event/${caseId}`)
-      .then(res => res.json())
-      .then(data => setObservations(data))
-      .catch(err => setError(err.message));
-  }, [caseId]);
+    const fetchObservations = async () => {
+      try {
+        const res = await fetch(`${baseURI}/observations/event/${eventId}`);
+        const data = await res.json();
+        setObservations(data);
+      } catch (err) {
+        setError('Error al cargar observaciones');
+      }
+    };
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+    fetchObservations();
+  }, [eventId]);
 
-  const handleCreate = async () => {
+  const handleChange = e => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async () => {
     try {
-      const res = await fetch('/observation', {
+      const res = await fetch(`${baseURI}/observation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ ...form, eventId: caseId })
+        body: JSON.stringify({ ...form, eventId: Number(eventId) })
       });
-      if (!res.ok) throw new Error('Error al registrar observación');
-      const created = await res.json();
-      setObservations(prev => [...prev, created]);
-      setForm({ title: '', content: '', eventId: '' });
+
+      if (!res.ok) throw new Error('Error al crear observación');
+      const saved = await res.json();
+      setObservations(prev => [...prev, saved]);
+      setForm({ title: '', content: '' });
     } catch (err) {
       setError(err.message);
     }
   };
 
-  const handleEditToggle = (obs) => {
-    setEditingId(obs.observationId);
-    setForm({ title: obs.title, content: obs.content, eventId: obs.eventId });
-  };
-
-  const handleUpdate = async () => {
+  const handleUpdate = async (obsId) => {
     try {
-      const res = await fetch(baseURI+`/observation/${editingId}`, {
+      const res = await fetch(`${baseURI}/observation/${obsId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -58,101 +60,106 @@ const ObservationDashboard = () => {
         },
         body: JSON.stringify(form)
       });
-      if (!res.ok) throw new Error('Error al actualizar observación');
       const updated = await res.json();
-      setObservations(prev => prev.map(o => o.observationId === editingId ? updated : o));
+      setObservations(prev =>
+        prev.map(o => (o.observationId === obsId ? updated : o))
+      );
       setEditingId(null);
+      setForm({ title: '', content: '' });
     } catch (err) {
       setError(err.message);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (obsId) => {
     try {
-      const res = await fetch(baseURI+`/observation/${id}`, {
+      await fetch(`${baseURI}/observation/${obsId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Error al eliminar observación');
-      setObservations(prev => prev.filter(o => o.observationId !== id));
+      setObservations(prev => prev.filter(o => o.observationId !== obsId));
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-[#F9F9F6] border border-[#A0A0A0] rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-[#1C2C54]">📌 Observaciones del Proceso #{caseId}</h2>
+    <div className="p-6 max-w-3xl mx-auto bg-[#1C2C54]  rounded-2xl shadow-md border">
+      {/* Botón de regresar */}
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center text-white hover:text-blue-800 mb-4"
+      >
+        <ArrowLeft className="mr-2" size={20} />
+        Volver
+      </button>
 
-      {error && <p className="text-[#6E1E2B]">{error}</p>}
+      <h2 className="text-3xl font-bold text-white mb-6">
+        Observaciones del Evento #{eventId}
+      </h2>
 
-      {/* Formulario de nueva observación */}
-      <div className="mb-6">
-        <input
-          name="title"
-          value={form.title}
-          onChange={handleChange}
-          placeholder="Título"
-          className="block mb-2 px-3 py-2 border rounded w-full"
-        />
-        <textarea
-          name="content"
-          value={form.content}
-          onChange={handleChange}
-          placeholder="Contenido"
-          className="block mb-2 px-3 py-2 border rounded w-full"
-        />
+      <input
+        name="title"
+        placeholder="Título"
+        value={form.title}
+        onChange={handleChange}
+        className="block w-full mb-3 px-4 py-2 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#1C2C54]"
+      />
+      <textarea
+        name="content"
+        placeholder="Contenido"
+        value={form.content}
+        onChange={handleChange}
+        className="block w-full mb-4 px-4 py-2 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#1C2C54]"
+      />
+      {editingId ? (
         <button
-          onClick={handleCreate}
-          className="bg-[#1C2C54] text-white px-4 py-2 rounded shadow-sm"
+          onClick={() => handleUpdate(editingId)}
+          className="bg-white hover:bg-[#2b3e6d] text-[#1C2C54] px-6 py-2 rounded-lg mb-4"
         >
-          Registrar Observación
+          Actualizar
         </button>
-      </div>
-
-      {/* Lista de observaciones */}
-      {observations.length === 0 ? (
-        <p className="text-sm text-[#A0A0A0]">No hay observaciones para este proceso.</p>
       ) : (
-        <ul className="space-y-4">
-          {observations.map(obs => (
-            <li key={obs.observationId} className="p-4 bg-white border-l-4 border-[#1C2C54] rounded shadow-sm">
-              {editingId === obs.observationId ? (
-                <>
-                  <input
-                    name="title"
-                    value={form.title}
-                    onChange={handleChange}
-                    className="block mb-1 border px-2 py-1 w-full"
-                  />
-                  <textarea
-                    name="content"
-                    value={form.content}
-                    onChange={handleChange}
-                    className="block mb-1 border px-2 py-1 w-full"
-                  />
-                  <div className="mt-2 flex gap-2">
-                    <button onClick={handleUpdate} className="bg-[#1C2C54] text-white px-3 py-1 rounded">Guardar</button>
-                    <button onClick={() => setEditingId(null)} className="bg-gray-400 text-white px-3 py-1 rounded">Cancelar</button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h3 className="text-lg font-semibold text-[#6E1E2B]">{obs.title}</h3>
-                  <p className="text-sm text-[#1C2C54] mb-2">{obs.content}</p>
-                  <p className="text-xs text-[#C9A66B]">Evento: {obs.eventId}</p>
-                  <div className="mt-3 flex gap-2">
-                    <button onClick={() => handleEditToggle(obs)} className="bg-[#1C2C54] text-white py-1 px-2 rounded text-sm">Editar</button>
-                    <button onClick={() => handleDelete(obs.observationId)} className="bg-[#6E1E2B] text-white py-1 px-2 rounded text-sm">Borrar</button>
-                  </div>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
+        <button
+          onClick={handleSubmit}
+          className="bg-white hover:bg-white text-[#1C2C54] px-6 py-2 rounded-lg mb-4"
+        >
+          Agregar
+        </button>
       )}
+
+      {error && <p className="text-red-600 mt-2">{error}</p>}
+
+      <ul className="mt-6 space-y-4">
+        {observations.map(o => (
+          <li key={o.observationId} className="border p-4 rounded-xl shadow-sm bg-gray-50">
+            <h3 className="text-lg font-semibold text-[#1C2C54]">{o.title}</h3>
+            <p className="text-sm text-[#1C2C54] mb-3">{o.content}</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setEditingId(o.observationId);
+                  setForm({ title: o.title, content: o.content });
+                }}
+                className="flex items-center gap-2 bg-[#1C2C54] hover:bg-indigo-700 text-white px-4 py-1.5 rounded"
+              >
+                <Edit size={16} />
+                Editar
+              </button>
+              <button
+                onClick={() => handleDelete(o.observationId)}
+                className="flex items-center gap-2 bg-[#1C2C54] hover:bg-red-700 text-white px-4 py-1.5 rounded"
+              >
+                <Trash2 size={16} />
+                Eliminar
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
 
 export default ObservationDashboard;
+
