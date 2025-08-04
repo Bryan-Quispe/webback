@@ -30,12 +30,27 @@ router.get('/reminder/:id', async (req, res) => {
 // 🔐 Crear nuevo recordatorio
 router.post('/reminder', authenticateToken, async (req, res) => {
   try {
-    const insertedReminder = await controller.createReminder(req);
+    // Buscar el reminder con el mayor reminderId actual
+    const maxReminder = await reminder.findOne().sort({ reminderId: -1 }).exec();
+    const nextId = maxReminder ? maxReminder.reminderId + 1 : 1;
+
+    const newReminder = new reminder({
+      reminderId: nextId,
+      title: req.body.title,
+      dateTime: req.body.dateTime,
+      activeFlag: req.body.activeFlag,
+      appointmentId: req.body.appointmentId || null,
+    });
+
+    const insertedReminder = await newReminder.save();
+
     res.status(201).json(insertedReminder);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Error al crear el recordatorio' });
   }
 });
+
 
 // 🔐 Actualizar recordatorio existente
 router.put('/reminder/:id', authenticateToken, async (req, res) => {

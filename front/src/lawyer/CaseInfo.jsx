@@ -127,23 +127,58 @@ const CaseInfo = () => {
         </div>
       ) : (
         <form onSubmit={handleInlineSave} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-sm text-[#1C2C54]">
-          <input type="text" value={formData.title} onChange={(e) => handleInputChange('title', e.target.value)} className="border p-2 rounded" placeholder="Título" />
-          <input type="text" value={formData.processType} onChange={(e) => handleInputChange('processType', e.target.value)} className="border p-2 rounded" placeholder="Tipo" />
-          <input type="text" value={formData.offense} onChange={(e) => handleInputChange('offense', e.target.value)} className="border p-2 rounded" placeholder="Delito" />
-          <input type="text" value={formData.province} onChange={(e) => handleInputChange('province', e.target.value)} className="border p-2 rounded" placeholder="Provincia" />
-          <input type="text" value={formData.canton} onChange={(e) => handleInputChange('canton', e.target.value)} className="border p-2 rounded" placeholder="Cantón" />
-          <input type="text" value={formData.clientGender} onChange={(e) => handleInputChange('clientGender', e.target.value)} className="border p-2 rounded" placeholder="Género cliente" />
-          <input type="number" value={formData.clientAge} onChange={(e) => handleInputChange('clientAge', e.target.value)} className="border p-2 rounded" placeholder="Edad cliente" />
-          <input type="text" value={formData.processStatus} onChange={(e) => handleInputChange('processStatus', e.target.value)} className="border p-2 rounded" placeholder="Estado" />
-          <input type="date" value={formData.startDate?.slice(0, 10)} onChange={(e) => handleInputChange('startDate', e.target.value)} className="border p-2 rounded" />
-          <input type="date" value={formData.endDate?.slice(0, 10)} onChange={(e) => handleInputChange('endDate', e.target.value)} className="border p-2 rounded" />
-          <input type="text" value={formData.processNumber} onChange={(e) => handleInputChange('processNumber', e.target.value)} className="border p-2 rounded" placeholder="Número de proceso" />
-          <textarea value={formData.processDescription} onChange={(e) => handleInputChange('processDescription', e.target.value)} className="border p-2 rounded col-span-full" placeholder="Descripción" />
-          <div className="flex gap-4 col-span-full mt-2">
-            <button type="submit" className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">Guardar</button>
-            <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</button>
-          </div>
-        </form>
+  <input type="text" value={formData.title} onChange={(e) => handleInputChange('title', e.target.value)} className="border p-2 rounded" placeholder="Título" />
+  <input type="text" value={formData.offense} onChange={(e) => handleInputChange('offense', e.target.value)} className="border p-2 rounded" placeholder="Delito" />
+  <input type="text" value={formData.canton} onChange={(e) => handleInputChange('canton', e.target.value)} className="border p-2 rounded" placeholder="Cantón" />
+
+  <textarea value={formData.processDescription} onChange={(e) => handleInputChange('processDescription', e.target.value)} className="border p-2 rounded col-span-full" placeholder="Descripción" />
+
+  <input type="text" value={formData.processNumber} readOnly className="border p-2 rounded bg-gray-200 text-gray-600" placeholder="Número de proceso" />
+
+  <input type="number" value={formData.clientAge} onChange={(e) => handleInputChange('clientAge', Number(e.target.value))} className="border p-2 rounded" placeholder="Edad del cliente" />
+
+  <select value={formData.processType} onChange={(e) => handleInputChange('processType', e.target.value)} className="border p-2 rounded">
+    <option value="">Seleccione tipo de proceso...</option>
+    {['civil', 'penal', 'laboral', 'administrativo'].map(tipo => (
+      <option key={tipo} value={tipo}>{tipo}</option>
+    ))}
+  </select>
+
+  <select value={formData.province} onChange={(e) => handleInputChange('province', e.target.value)} className="border p-2 rounded">
+    <option value="">Seleccione provincia...</option>
+    {[
+      'Azuay', 'Bolívar', 'Cañar', 'Carchi', 'Chimborazo', 'Cotopaxi', 'El Oro',
+      'Esmeraldas', 'Galápagos', 'Guayas', 'Imbabura', 'Loja', 'Los Ríos',
+      'Manabí', 'Morona Santiago', 'Napo', 'Orellana', 'Pastaza', 'Pichincha',
+      'Santa Elena', 'Santo Domingo de los Tsáchilas', 'Sucumbíos', 'Tungurahua',
+      'Zamora Chinchipe',
+    ].map(prov => (
+      <option key={prov} value={prov}>{prov}</option>
+    ))}
+  </select>
+
+  <select value={formData.processStatus} onChange={(e) => handleInputChange('processStatus', e.target.value)} className="border p-2 rounded">
+    <option value="">Seleccione estado...</option>
+    {['no iniciado', 'en progreso', 'completado'].map(est => (
+      <option key={est} value={est}>{est}</option>
+    ))}
+  </select>
+
+  <select value={formData.clientGender} onChange={(e) => handleInputChange('clientGender', e.target.value)} className="border p-2 rounded">
+    <option value="">Seleccione género...</option>
+    {['masculino', 'femenino', 'otro'].map(gen => (
+      <option key={gen} value={gen}>{gen}</option>
+    ))}
+  </select>
+
+  <input type="date" value={formData.startDate?.slice(0, 10)} onChange={(e) => handleInputChange('startDate', e.target.value)} className="border p-2 rounded" />
+  <input type="date" value={formData.endDate?.slice(0, 10)} onChange={(e) => handleInputChange('endDate', e.target.value)} className="border p-2 rounded" />
+
+  <div className="flex gap-4 col-span-full mt-2">
+    <button type="submit" className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">Guardar</button>
+    <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</button>
+  </div>
+</form>
       )}
 
       <hr className="border-t border-gray-300 my-6" />
