@@ -1,11 +1,13 @@
+// models/Event.js
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const eventSchema = new mongoose.Schema({
   name: String,
   description: String,
   dateStart: Date,
   dateEnd: Date,
-  eventId: Number,
+  eventId: { type: Number, required: true, unique: true },
   orderIndex: Number,
   processId: {
     type: Number,
@@ -20,5 +22,7 @@ const eventSchema = new mongoose.Schema({
     },
   },
 });
+
+eventSchema.plugin(AutoIncrement, { inc_field: 'eventId' });
 
 module.exports = mongoose.model('Event', eventSchema, 'event');

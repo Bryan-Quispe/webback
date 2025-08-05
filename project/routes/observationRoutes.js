@@ -79,6 +79,26 @@ router.delete('/observation/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// 🔓 Obtener observaciones por processId (consulta libre)
+router.get('/observations/process/:processId', async (req, res) => {
+  try {
+    const processId = Number(req.params.processId);
+    if (isNaN(processId)) {
+      return res.status(400).json({ message: 'processId debe ser un número' });
+    }
+
+    // Buscar eventos vinculados al processId
+    const events = await Event.find({ processId });
+    const eventIds = events.map((e) => e.eventId);
+
+    // Buscar observaciones relacionadas a esos eventos
+    const observations = await Observation.find({ eventId: { $in: eventIds } });
+
+    res.status(200).json(observations);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 // 🔓 Listar observaciones en orden descendente
 router.get('/observations/desc', async (req, res) => {

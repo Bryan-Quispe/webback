@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getEvidenciasByProcessId } from '../../api/evidenceApi';
-import { getProcessById } from '../../api/processApi'; // importar función para obtener proceso
+import { getProcessById } from '../../api/processApi';
 import { useParams } from 'react-router-dom';
 
 const EvidenciasLectura = () => {
@@ -8,34 +8,65 @@ const EvidenciasLectura = () => {
   const [evidencias, setEvidencias] = useState([]);
   const [process, setProcess] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+      setError(null);
       try {
+        const parsedProcessId = Number(processId);
+        if (isNaN(parsedProcessId)) {
+          throw new Error('ID de proceso no válido.');
+        }
+
         const [procData, evs] = await Promise.all([
-          getProcessById(processId),
-          getEvidenciasByProcessId(processId),
+          getProcessById(parsedProcessId),
+          getEvidenciasByProcessId(parsedProcessId),
         ]);
+
+        // Validar datos
+        if (!procData || !procData.title) {
+          throw new Error('No se encontró el proceso.');
+        }
+        if (!Array.isArray(evs)) {
+          throw new Error('Las evidencias no tienen el formato esperado.');
+        }
+
         setProcess(procData);
         setEvidencias(evs);
       } catch (error) {
+        setError(error.message || 'Error al cargar los datos.');
         setProcess(null);
         setEvidencias([]);
-        console.error(error);
+        console.error('Error fetching evidences:', error);
       } finally {
         setLoading(false);
       }
     }
-    fetchData();
+    if (processId) {
+      fetchData();
+    } else {
+      setError('ID de proceso no proporcionado.');
+      setLoading(false);
+    }
   }, [processId]);
 
-  if (loading)
+  if (loading) {
     return (
       <div className="text-white min-h-screen bg-gray-900 flex items-center justify-center">
         Cargando evidencias...
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500 min-h-screen bg-gray-900 flex items-center justify-center">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
@@ -51,9 +82,14 @@ const EvidenciasLectura = () => {
               key={ev._id}
               className="bg-gray-800 p-6 rounded shadow border-l-8 border-purple-600"
             >
-              <h3 className="text-xl font-semibold mb-2">{ev.evidenceName}</h3>
-              <p className="text-gray-300 mb-3">Tipo: {ev.evidenceType}</p>
-              {ev.filePath && (
+              <h3 className="text-xl font-semibold mb-2">
+                {ev.evidenceName || 'Sin nombre'}
+              </h3>
+              <p className="text-gray-300 mb-3">
+                Tipo: {ev.evidenceType || 'No especificado'}
+              </p>
+              <p className="text-gray-400 text-sm">Evento ID: {ev.eventId}</p>
+              {ev.filePath ? (
                 <a
                   href={`http://localhost:3000/${ev.filePath}`}
                   target="_blank"
@@ -62,6 +98,8 @@ const EvidenciasLectura = () => {
                 >
                   Ver archivo
                 </a>
+              ) : (
+                <p className="text-gray-400">No hay archivo disponible.</p>
               )}
             </li>
           ))}

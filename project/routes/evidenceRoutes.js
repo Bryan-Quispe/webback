@@ -13,19 +13,20 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // 🔐 Crear evidencia (protegido)
+// routes/evidences.js
 router.post('/evidence', authenticateToken, async (req, res) => {
   try {
     const { eventId, evidenceType, evidenceName, filePath } = req.body;
 
     // Validar que eventId existe
-    const eventExists = await Event.findOne({ eventId });
+    const eventExists = await Event.findOne({ eventId: Number(eventId) });
     if (!eventExists) {
       return res.status(400).json({ message: 'Evento no existe' });
     }
 
-    // Crear nueva evidencia
+    // Crear nueva evidencia (evidenceId se genera automáticamente por el plugin)
     const newEvidence = new Evidence({
-      eventId,
+      eventId: Number(eventId),
       evidenceType,
       evidenceName,
       filePath,
@@ -34,7 +35,9 @@ router.post('/evidence', authenticateToken, async (req, res) => {
     const saved = await newEvidence.save();
     res.status(201).json(saved);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({ message: 'Error al crear evidencia', error: err.message });
   }
 });
 

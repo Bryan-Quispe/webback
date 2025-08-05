@@ -8,34 +8,65 @@ const ObservacionesLectura = () => {
   const [observaciones, setObservaciones] = useState([]);
   const [process, setProcess] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+      setError(null);
       try {
+        const parsedProcessId = Number(processId);
+        if (isNaN(parsedProcessId)) {
+          throw new Error('ID de proceso no válido.');
+        }
+
         const [procData, obs] = await Promise.all([
-          getProcessById(processId),
-          getObservationsByProcessId(processId),
+          getProcessById(parsedProcessId),
+          getObservationsByProcessId(parsedProcessId),
         ]);
+
+        // Validar datos
+        if (!procData || !procData.title) {
+          throw new Error('No se encontró el proceso.');
+        }
+        if (!Array.isArray(obs)) {
+          throw new Error('Las observaciones no tienen el formato esperado.');
+        }
+
         setProcess(procData);
         setObservaciones(obs);
       } catch (error) {
+        setError(error.message || 'Error al cargar los datos.');
         setProcess(null);
         setObservaciones([]);
-        console.error(error);
+        console.error('Error fetching observations:', error);
       } finally {
         setLoading(false);
       }
     }
-    fetchData();
+    if (processId) {
+      fetchData();
+    } else {
+      setError('ID de proceso no proporcionado.');
+      setLoading(false);
+    }
   }, [processId]);
 
-  if (loading)
+  if (loading) {
     return (
       <div className="text-white min-h-screen bg-gray-900 flex items-center justify-center">
         Cargando observaciones...
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500 min-h-screen bg-gray-900 flex items-center justify-center">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
@@ -51,8 +82,11 @@ const ObservacionesLectura = () => {
               key={obs._id}
               className="bg-gray-800 p-4 rounded shadow border-l-4 border-blue-500"
             >
-              <h3 className="font-semibold text-lg">{obs.title}</h3>
-              <p className="text-gray-300">{obs.content}</p>
+              <h3 className="font-semibold text-lg">
+                {obs.title || 'Sin título'}
+              </h3>
+              <p className="text-gray-300">{obs.content || 'Sin contenido'}</p>
+              <p className="text-gray-400 text-sm">Evento ID: {obs.eventId}</p>
             </li>
           ))}
         </ul>
