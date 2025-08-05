@@ -28,7 +28,11 @@ const app = express();
 // Middleware de CORS (solo frontend permitido en desarrollo)
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https://webback-sable.vercel.app'],
+    origin: [
+      'http://localhost:5173',
+      'https://webback-sable.vercel.app',
+      'https://webback-five.vercel.app',
+    ],
     credentials: true,
   })
 );
