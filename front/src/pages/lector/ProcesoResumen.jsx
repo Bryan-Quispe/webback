@@ -7,20 +7,37 @@ export default function ProcesoResumen() {
   const navigate = useNavigate();
   const [process, setProcess] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    getProcessById(processId)
+    const parsedProcessId = Number(processId);
+    if (isNaN(parsedProcessId)) {
+      setError('ID de proceso no válido.');
+      setLoading(false);
+      return;
+    }
+
+    getProcessById(parsedProcessId)
       .then((data) => {
+        if (!data || !data.title) {
+          throw new Error('No se encontró el proceso.');
+        }
         setProcess(data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        setError(err.message || 'Error al cargar el proceso.');
         setLoading(false);
+        console.error('Error fetching process:', err);
       });
   }, [processId]);
 
   const formatDate = (dateStr) =>
     dateStr ? new Date(dateStr).toLocaleDateString('es-EC') : 'No disponible';
+
+  const goToDashboard = () => {
+    navigate('/lector');
+  };
 
   const goToObservaciones = () => {
     navigate(`/procesos/${processId}/observaciones`);
@@ -30,32 +47,54 @@ export default function ProcesoResumen() {
     navigate(`/procesos/${processId}/evidencias`);
   };
 
-  if (loading) return <div className="text-white">Cargando...</div>;
-  if (!process)
-    return <div className="text-red-500">Proceso no encontrado.</div>;
+  if (loading) {
+    return (
+      <div className="text-white min-h-screen bg-gray-900 flex items-center justify-center">
+        Cargando...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500 min-h-screen bg-gray-900 flex items-center justify-center">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white py-10 px-4">
-      <h1 className="text-3xl font-bold mb-4">{process.title}</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">{process.title}</h1>
+        <button
+          onClick={goToDashboard}
+          className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-full"
+        >
+          Volver al Dashboard
+        </button>
+      </div>
 
       <div className="bg-gray-800 p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
         <p className="mb-3 text-gray-300">{process.processDescription}</p>
 
         <div className="space-y-2 text-sm">
           <p>
-            <strong>Número de Proceso:</strong> {process.processNumber}
+            <strong>Número de Proceso:</strong>{' '}
+            {process.processNumber || 'No disponible'}
           </p>
           <p>
-            <strong>Tipo de Proceso:</strong> {process.processType}
+            <strong>Tipo de Proceso:</strong>{' '}
+            {process.processType || 'No especificado'}
           </p>
           <p>
-            <strong>Delito:</strong> {process.offense}
+            <strong>Delito:</strong> {process.offense || 'No especificado'}
           </p>
           <p>
-            <strong>Provincia:</strong> {process.province}
+            <strong>Provincia:</strong> {process.province || 'No especificado'}
           </p>
           <p>
-            <strong>Cantón:</strong> {process.canton}
+            <strong>Cantón:</strong> {process.canton || 'No especificado'}
           </p>
           <p>
             <strong>Estado:</strong>{' '}
@@ -75,8 +114,8 @@ export default function ProcesoResumen() {
                 : process.processStatus === 'in progress'
                 ? 'En proceso'
                 : process.processStatus === 'completed'
-                ? 'Cerrado'
-                : process.processStatus}
+                ? 'Completado'
+                : process.processStatus || 'Desconocido'}
             </span>
           </p>
           <p>
@@ -87,10 +126,12 @@ export default function ProcesoResumen() {
             {formatDate(process.endDate)}
           </p>
           <p>
-            <strong>Edad del Cliente:</strong> {process.clientAge} años
+            <strong>Edad del Cliente:</strong>{' '}
+            {process.clientAge || 'No especificado'} años
           </p>
           <p>
-            <strong>Género del Cliente:</strong> {process.clientGender}
+            <strong>Género del Cliente:</strong>{' '}
+            {process.clientGender || 'No especificado'}
           </p>
         </div>
 

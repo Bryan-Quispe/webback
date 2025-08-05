@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { getEvidenciasByProcessId } from '../../api/evidenceApi';
 import { getProcessById } from '../../api/processApi';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const EvidenciasLectura = () => {
   const { processId } = useParams();
+  const navigate = useNavigate();
   const [evidencias, setEvidencias] = useState([]);
   const [process, setProcess] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +26,6 @@ const EvidenciasLectura = () => {
           getEvidenciasByProcessId(parsedProcessId),
         ]);
 
-        // Validar datos
         if (!procData || !procData.title) {
           throw new Error('No se encontró el proceso.');
         }
@@ -52,6 +52,18 @@ const EvidenciasLectura = () => {
     }
   }, [processId]);
 
+  const goToDashboard = () => {
+    navigate('/lector');
+  };
+
+  const goToProceso = () => {
+    navigate(`/lector/proceso/${processId}`);
+  };
+
+  const goToObservaciones = () => {
+    navigate(`/procesos/${processId}/observaciones`);
+  };
+
   if (loading) {
     return (
       <div className="text-white min-h-screen bg-gray-900 flex items-center justify-center">
@@ -70,7 +82,29 @@ const EvidenciasLectura = () => {
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
-      {process && <h1 className="text-3xl font-bold mb-6">{process.title}</h1>}
+      <div className="flex justify-between items-center mb-6">
+        {process && <h1 className="text-3xl font-bold">{process.title}</h1>}
+        <div className="flex gap-4">
+          <button
+            onClick={goToDashboard}
+            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-full"
+          >
+            Volver al Dashboard
+          </button>
+          <button
+            onClick={goToProceso}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full"
+          >
+            Volver al Proceso
+          </button>
+          <button
+            onClick={goToObservaciones}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full"
+          >
+            Ver Observaciones
+          </button>
+        </div>
+      </div>
 
       <h2 className="text-2xl font-bold mb-4">Evidencias</h2>
       {evidencias.length === 0 ? (
