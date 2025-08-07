@@ -1,7 +1,7 @@
 const ACCOUNT = 'https://webback-x353.onrender.com/legalsystem/account/';
 const PROFILE = 'https://webback-x353.onrender.com/legalsystem/profile/';
 
-const userId=localStorage.getItem("userId") ?? 15;
+const userId=localStorage.getItem("userId") ?? 20;
 
 export const getAccountData = async () =>{
         const uri=ACCOUNT+userId+'/public';

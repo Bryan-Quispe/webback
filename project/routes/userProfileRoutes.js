@@ -1,7 +1,13 @@
 const express = require('express');
+const multer = require('multer');
+const {
+  cloudinary, evidenceStorage, profilePicturesStorage, createSignedURL
+} = require('../middleware/cloudinaryConfig');
 const UserProfile = require('../models/UserProfile');
 const { authenticateToken } = require('../middleware/authenticateToken'); // Seguridad integrada
 const router = express.Router();
+
+const pictureUploads=multer({profilePicturesStorage});
 
 // 🔓 Obtener todos los perfiles de usuario
 router.get('/profiles', async (req, res) => {
@@ -48,7 +54,6 @@ router.put('/profile/update/:id', authenticateToken, async (req, res) => {
     title: req.body.title,
     bio: req.body.bio,
     address: req.body.address,
-    profilePicture: req.body.profilePicture,
     accountId: req.body.accountId
   };
 
@@ -74,8 +79,8 @@ router.delete('/profile/delete/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// 🔐 Subir imagen de perfil (requiere configuración de multer)
-router.post('/profile/uploadImage/:id', authenticateToken, async (req, res) => {
+// 🔐 Subir o Actualizar imagen de perfil (requiere configuración de multer)
+router.post('/profile/uploadImage/:id', authenticateToken, pictureUploads.single('file'), async (req, res) => {
   try {
     const updated = await UserProfile.findOneAndUpdate(
       { profileId: req.params.id },

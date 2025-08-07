@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext} from 'react-router-dom'
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { ArrowLeft, Trash2, Edit } from 'lucide-react';
@@ -36,6 +37,7 @@ const eventsListItemStyle = {
 };
 
 const PendingCalendar = () => {
+  const { handleSetSelected: isCaseSelected, handleSetSelectedId: setCaseId } = useOutletContext();
   const { caseId } = useParams();
   const [events, setEvents] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -44,6 +46,7 @@ const PendingCalendar = () => {
   const baseURI = 'https://webback-x353.onrender.com/legalsystem';
   const navigate = useNavigate();
   useEffect(() => {
+    isCaseSelected(true);
     const fetchEvents = async () => {
       const token = localStorage.getItem('token');
       try {

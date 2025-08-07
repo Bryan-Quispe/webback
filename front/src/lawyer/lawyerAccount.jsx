@@ -6,7 +6,7 @@ import * as Icons from 'react-bootstrap-icons';
 import { useAlert } from '../components/alerts/alertElement';
 import App from '../App';
 
-export default function AccountData()
+export default function LawyerAccount()
 {
     const {showAlert}=useAlert();
     const [name, setName]=useState("");
@@ -55,12 +55,12 @@ export default function AccountData()
 
     return (
     <>
-    <div className="max-w-9/10 w-8/10 mx-auto p-4 bg-regal-blue shadow mt-8">
+    <div className="w-9/10 mx-auto p-4 bg-regal-blue shadow mt-8">
       <h1 className="text-4xl mb-6 items-center">
         <Icons.PersonCircle className='inline-block h-9 w-9'/>  Datos Personales
       </h1>
-      <div className="flex gap-4 mb-4">
-        <div className="flex-1">
+      <div className="flex flex-row justify-items-center gap-4 mb-4 mx-6">
+        <div className="flex-1 align-center">
           <label className="block text-sm text-bone-white mb-1" htmlFor="name">
             Nombre
           </label>
@@ -71,7 +71,7 @@ export default function AccountData()
               value={name}
               disabled={!editingOn}
               onChange={(e)=>{setName(e.target.value)}}
-              className="w-full border rounded-sm text-black bg-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-6/10 border rounded-sm text-black bg-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
         </div>
 
@@ -86,13 +86,12 @@ export default function AccountData()
               value={lastname}
               disabled={!editingOn}
               onChange={(e)=>{setLastname(e.target.value)}}
-              className="w-full border rounded-sm text-black bg-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-6/10 border rounded-sm text-black bg-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
         </div>
       </div>
 
-      {/* Segunda fila: Email y Teléfono */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-row justify-items-center gap-6 mb-4 mx-6 justify-center">
         <div className="flex-1">
           <label className="block text-sm text-bone-white mb-1" htmlFor="email">
             Correo electrónico
@@ -104,7 +103,7 @@ export default function AccountData()
               value={email}
               disabled={!editingOn}
               onChange={(e)=>{setEmail(e.target.value)}}
-              className="w-full border rounded-sm text-black bg-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-6/10 border rounded-sm text-black bg-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
         </div>
 
@@ -119,7 +118,7 @@ export default function AccountData()
               value={phone}
               disabled={!editingOn}
               onChange={(e)=>{setPhone(e.target.value)}}
-              className="w-full border rounded-sm text-black bg-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-6/10 border rounded-sm text-black bg-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
         </div>
       </div>

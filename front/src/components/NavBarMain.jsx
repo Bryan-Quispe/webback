@@ -20,7 +20,7 @@ export default function NavBarMain()
     const toggleAccountOptions = () => handleAccountOptions(!accountClicked);
     const closeAccountOptions = () => {
       localStorage.clear();
-      window.location.href='../../login';
+      window.location.href='../../';
     };
     const handleGetUserData = async () =>{
       const userData=await getAccountData();

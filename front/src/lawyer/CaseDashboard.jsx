@@ -42,7 +42,6 @@ function CaseDashboard() {
   useEffect(() => {
     isCaseSelected(false);
     if (!token) {
-      alert('Debe iniciar sesión');
       navigate('/unauthorized');
       return;
     }
