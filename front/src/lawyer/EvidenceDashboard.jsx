@@ -13,19 +13,46 @@ const EvidenceDashboard = () => {
     filePath: '',
   });
   const [editingId, setEditingId] = useState(null);
+  const [isUploading, setIsUploading] = useState(false); // Estado para mostrar carga
   const token = localStorage.getItem('token');
 
   useEffect(() => {
     axios
-      .get(`https://webback-x353.onrender.com/legalsystem/evidences/event/${eventId}`)
+      .get(
+        `https://webback-x353.onrender.com/legalsystem/evidences/event/${eventId}`
+      )
       .then((res) => setEvidences(res.data))
       .catch((err) => console.error('Error al obtener evidencias', err));
   }, [eventId]);
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData({ ...formData, filePath: file.name });
+      setIsUploading(true);
+      const formDataToUpload = new FormData();
+      formDataToUpload.append('file', file);
+
+      try {
+        const res = await axios.post(
+          `https://webback-x353.onrender.com/legalsystem/evidence/upload`,
+          formDataToUpload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        setFormData((prev) => ({
+          ...prev,
+          filePath: res.data.urlArchivo, // Usar la URL segura de Cloudinary
+        }));
+      } catch (err) {
+        console.error('Error al subir archivo', err);
+        alert('Error al subir el archivo. Por favor, intenta de nuevo.');
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -62,9 +89,10 @@ const EvidenceDashboard = () => {
       setEditingId(null);
     } catch (err) {
       console.error('Error al guardar evidencia', err);
+      alert('Error al guardar la evidencia. Por favor, verifica los datos.');
     }
 
-    window.location.reload();
+    window.location.reload(); // Recargar para reflejar cambios
   };
 
   const handleEdit = (evidence) => {
@@ -85,6 +113,7 @@ const EvidenceDashboard = () => {
       setEvidences((prev) => prev.filter((ev) => ev.evidenceId !== evidenceId));
     } catch (err) {
       console.error('Error al eliminar evidencia', err);
+      alert('Error al eliminar la evidencia.');
     }
   };
 
@@ -95,7 +124,9 @@ const EvidenceDashboard = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-[#1C2C54] rounded-xl shadow-md border border-gray-200">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-white-800">Evidencias del Evento #{eventId}</h2>
+        <h2 className="text-2xl font-bold text-white-800">
+          Evidencias del Evento #{eventId}
+        </h2>
         <button
           onClick={goBack}
           className="flex items-center gap-2 text-white-600 hover:text-blue-800"
@@ -131,10 +162,15 @@ const EvidenceDashboard = () => {
           type="file"
           onChange={handleFileSelect}
           className="w-full p-2 border rounded"
+          disabled={isUploading}
         />
+        {isUploading && (
+          <p className="text-sm text-gray-600">Subiendo archivo...</p>
+        )}
         <button
           type="submit"
           className="bg-[#1C2C54] hover:bg-blue-700 text-white px-4 py-2 rounded shadow"
+          disabled={isUploading || !formData.filePath}
         >
           {editingId ? 'Actualizar evidencia' : 'Agregar evidencia'}
         </button>
@@ -142,9 +178,12 @@ const EvidenceDashboard = () => {
 
       {!evidences || evidences.length === 0 ? (
         <div className="mt-6 p-4 bg-white rounded-lg shadow-md text-center border border-gray-300">
-          <h3 className="text-[#6E1E2B] text-lg font-semibold mb-2">📂 Sin evidencias disponibles</h3>
+          <h3 className="text-[#6E1E2B] text-lg font-semibold mb-2">
+            📂 Sin evidencias disponibles
+          </h3>
           <p className="text-[#1C2C54] text-sm">
-            Este evento no tiene evidencias registradas aún. Puedes añadir una para comenzar a documentar.
+            Este evento no tiene evidencias registradas aún. Puedes añadir una
+            para comenzar a documentar.
           </p>
         </div>
       ) : (
@@ -156,8 +195,20 @@ const EvidenceDashboard = () => {
             >
               <div>
                 <p className="font-semibold text-gray-700">{ev.evidenceName}</p>
-                <p className="text-sm text-gray-700"><strong>Tipo:</strong> {ev.evidenceType}</p>
-                <p className="text-sm text-gray-700"><strong>Archivo:</strong> {ev.filePath}</p>
+                <p className="text-sm text-gray-700">
+                  <strong>Tipo:</strong> {ev.evidenceType}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>Archivo:</strong>{' '}
+                  <a
+                    href={ev.filePath}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    {ev.filePath}
+                  </a>
+                </p>
               </div>
               <div className="flex gap-2">
                 <button
@@ -184,20 +235,3 @@ const EvidenceDashboard = () => {
 };
 
 export default EvidenceDashboard;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
