@@ -80,98 +80,118 @@ export default function Lector() {
     navigate(`/lector/proceso/${processId}`);
   };
 
+  // Función para truncar la descripción
+  const truncateDescription = (text, maxWords = 10) => {
+    if (!text) return '';
+    const words = text.split(' ');
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '...';
+  };
+
   return (
     <>
-      <h1 className="text-3xl font-bold text-center mb-8">Procesos Públicos</h1>
-      {/* Filtros */}
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-black">
-        {/* Estado */}
-        <select
-          className="p-2 rounded-md bg-white"
-          value={filters.estado}
-          onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
-        >
-          <option value="">Todos los estados</option>
-          <option value="no iniciado">Abierto</option>
-          <option value="in progress">In Proceso</option>
-          <option value="completed">Completado</option>
-        </select>
-
-        {/* Tipo */}
-        <select
-          className="p-2 rounded-md bg-white"
-          value={filters.tipo}
-          onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
-        >
-          <option value="">Todos los tipos</option>
-          <option value="Civil">Civil</option>
-          <option value="Penal">Penal</option>
-          <option value="Laboral">Laboral</option>
-          <option value="Administrativo">Administrativo</option>
-        </select>
-
-        {/* Provincia */}
-        <select
-          className="p-2 rounded-md bg-white"
-          value={filters.provincia}
-          onChange={(e) =>
-            setFilters({ ...filters, provincia: e.target.value })
-          }
-        >
-          <option value="">Todas las provincias</option>
-          {provinciasEcuador.map((prov) => (
-            <option key={prov} value={prov}>
-              {prov}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {loading && (
-        <div className="text-center text-gray-300 text-lg">
-          Cargando procesos...
-        </div>
-      )}
-
-      {error && <div className="text-center text-red-500 text-lg">{error}</div>}
-
-      {!loading && !error && filteredProcesses.length === 0 && (
-        <div className="text-center text-gray-400">
-          No hay procesos que coincidan con los filtros.
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProcesses.map((process) => (
-          <div
-            key={process.processId}
-            onClick={() => handleClick(process.processId)}
-            className="bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 cursor-pointer"
+      <Navbar />
+      <div className="max-w-7xl mx-auto p-6">
+        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
+          Procesos Públicos
+        </h1>
+        {/* Filtros */}
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-black">
+          {/* Estado */}
+          <select
+            className="p-2 rounded-md bg-white"
+            value={filters.estado}
+            onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
           >
-            <h2 className="text-xl font-semibold mb-2">{process.title}</h2>
-            <p className="text-gray-300 mb-2">{process.processDescription}</p>
-            <div className="flex flex-wrap gap-2">
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  process.processStatus === 'Abierto'
-                    ? 'bg-green-600 text-white'
-                    : process.processStatus === 'Cerrado'
-                    ? 'bg-red-600 text-white'
-                    : 'bg-yellow-500 text-black'
-                }`}
-              >
-                {process.processStatus}
-              </span>
-              <span className="bg-blue-700 text-white px-3 py-1 rounded-full text-sm">
-                {process.processType}
-              </span>
-              <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm">
-                {process.province}
-              </span>
-            </div>
+            <option value="">Todos los estados</option>
+            <option value="no iniciado">Abierto</option>
+            <option value="in progress">In Proceso</option>
+            <option value="completed">Completado</option>
+          </select>
+
+          {/* Tipo */}
+          <select
+            className="p-2 rounded-md bg-white"
+            value={filters.tipo}
+            onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
+          >
+            <option value="">Todos los tipos</option>
+            <option value="Civil">Civil</option>
+            <option value="Penal">Penal</option>
+            <option value="Laboral">Laboral</option>
+            <option value="Administrativo">Administrativo</option>
+          </select>
+
+          {/* Provincia */}
+          <select
+            className="p-2 rounded-md bg-white"
+            value={filters.provincia}
+            onChange={(e) =>
+              setFilters({ ...filters, provincia: e.target.value })
+            }
+          >
+            <option value="">Todas las provincias</option>
+            {provinciasEcuador.map((prov) => (
+              <option key={prov} value={prov}>
+                {prov}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {loading && (
+          <div className="text-center text-gray-300 text-lg">
+            Cargando procesos...
           </div>
-        ))}
+        )}
+
+        {error && (
+          <div className="text-center text-red-500 text-lg">{error}</div>
+        )}
+
+        {!loading && !error && filteredProcesses.length === 0 && (
+          <div className="text-center text-gray-400">
+            No hay procesos que coincidan con los filtros.
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProcesses.map((process) => (
+            <div
+              key={process.processId}
+              onClick={() => handleClick(process.processId)}
+              className="bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 cursor-pointer"
+            >
+              <h2 className="text-xl font-semibold mb-2 text-white">
+                {process.title}
+              </h2>
+              <p className="text-gray-300 mb-2 text-sm">
+                {truncateDescription(process.processDescription)}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    process.processStatus === 'no iniciado'
+                      ? 'bg-green-600 text-white'
+                      : process.processStatus === 'completed'
+                      ? 'bg-red-600 text-white'
+                      : 'bg-yellow-500 text-black'
+                  }`}
+                >
+                  {process.processStatus || 'Sin estado'}
+                </span>
+                <span className="bg-blue-700 text-white px-3 py-1 rounded-full text-sm">
+                  {process.processType || 'Sin tipo'}
+                </span>
+                <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm">
+                  {process.province || 'Sin provincia'}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+      <ReaderFooter />
     </>
   );
 }
