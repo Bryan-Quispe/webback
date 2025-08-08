@@ -125,7 +125,7 @@ const EvidenciasLectura = () => {
               <p className="text-gray-400 text-sm">Evento ID: {ev.eventId}</p>
               {ev.filePath ? (
                 <a
-                  href={`http://localhost:3000/${ev.filePath}`}
+                  href={`${ev.filePath}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-indigo-400 hover:text-indigo-600 underline font-medium"
