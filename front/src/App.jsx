@@ -27,13 +27,13 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginLayout />}></Route>
         <Route path="/lawyer" element={<LayoutLawyer />}>
-          <Route path="dashboard" element={<CaseDashboard />} />
-          <Route path="account" element={<AccountData />} />
-          <Route path="case-info/:id" element={<CaseInfo />} />
-          <Route path="event-dashboard/:caseId" element={<EventDashboard />} />
-          <Route path="create-case" element={<CaseCreate />} /> 
-          <Route path="evidences/:eventId" element={<EvidenceDashboard />} />
-          <Route path="observations/:eventId" element={<ObservationDashboard />} />
+          <Route path="/dashboard" element={<CaseDashboard />} />
+          <Route path="/account" element={<AccountData />} />
+          <Route path="/case-info/:id" element={<CaseInfo />} />
+          <Route path="/event-dashboard/:caseId" element={<EventDashboard />} />
+          <Route path="/create-case" element={<CaseCreate />} /> 
+          <Route path="/evidences/:eventId" element={<EvidenceDashboard />} />
+          <Route path="/observations/:eventId" element={<ObservationDashboard />} />
           <Route
             path="pending-calendar/:caseId"
             element={<PendingCalendar />}
