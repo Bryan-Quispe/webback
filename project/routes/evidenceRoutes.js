@@ -125,7 +125,7 @@ router.post(
 
       const fileUrl = req.file.path; // URL segura de Cloudinary
       const publicId = req.file.filename.split('/').pop(); // Extraer public ID
-      const signedUrl = createSignedURL(publicId, 3600); // URL firmada válida por 1 hora
+      const signedUrl = createSignedURL(publicId, 5); // URL firmada válida por 5 segundos
 
       res.status(200).json({
         urlArchivo: fileUrl,
