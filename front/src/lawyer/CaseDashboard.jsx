@@ -156,6 +156,9 @@ function CaseDashboard() {
             <option value="penal">Penal</option>
             <option value="administrativo">Administrativo</option>
             <option value="laboral">Laboral</option>
+            <option value="constitucional">Constitucional</option>
+            <option value="contencioso">Contencioso</option>
+            <option value="violencia contra la mujer">Constitucional</option>
           </select>
           <select
             value={filters.province}

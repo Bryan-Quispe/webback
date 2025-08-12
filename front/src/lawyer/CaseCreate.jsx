@@ -10,7 +10,7 @@ const provincias = [
   'Zamora Chinchipe',
 ];
 
-const tiposProceso = ['civil', 'penal', 'laboral', 'administrativo'];
+const tiposProceso = ['civil', 'penal', 'laboral', 'administrativo','constitucional','contencioso','violencia contra la mujer'];
 const estadosProceso = ['no iniciado', 'en progreso', 'completado'];
 const generos = ['masculino', 'femenino', 'otro'];
 
