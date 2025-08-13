@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as Icon from 'react-bootstrap-icons';
 import '../App.css';
 import './navbar.css';
-import LegalLogo from '../assets/LegalLogo.png';
+import LegalLogo from '../assets/legalLogo.svg';
 import {
   UserCircleIcon,
   CalendarIcon,
