@@ -36,11 +36,17 @@ export default function LoginElement() {
       setPassword("");      
   }
 
+  const handleFormSubmission= (event) =>{
+    event.preventDefault();
+    handleSendLoginInfo();
+  }
+
 
   return (
     <div className="w-full space-y-2 max-w-md mx-auto bg-white/10 text-bone-white p-6 rounded-xl shadow-md backdrop-blur">
       <h2 className="text-2xl font-bold mb-5 text-center">Iniciar Sesión</h2>
-        <div>
+        <form onSubmit={handleFormSubmission}>
+          <div>
           <label htmlFor="userMail" className="block text-sm mb-1">
             Correo
           </label>
@@ -66,12 +72,15 @@ export default function LoginElement() {
             className="w-full px-4 py-2 rounded-md bg-bone-white text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <button
-          onClick={handleSendLoginInfo}
-          className="w-full bg-regal-blue hover:bg-blue-700 text-white py-2 px-4 rounded-md transition duration-200"
-        >
-          Iniciar Sesión
-        </button>
+        <div className='mt-2'>
+          <button
+            type='submit'
+            className="w-full mt-2 bg-regal-blue hover:bg-blue-700 text-white py-2 px-4 rounded-md transition duration-200"
+          >
+            Iniciar Sesión
+          </button>
+        </div>
+        </form>
     </div>
   );
 }
