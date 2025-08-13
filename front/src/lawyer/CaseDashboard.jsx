@@ -45,6 +45,7 @@ function CaseDashboard() {
     'Manabí',
     'Loja',
   ]);
+  const [reportType, setReportType] = useState('all'); // Nuevo estado para tipo de reporte
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const baseURL = 'https://webback-x353.onrender.com/legalsystem';
@@ -151,9 +152,20 @@ function CaseDashboard() {
     setLoading(true);
     setErrorMsg('');
     try {
-      // Obtener detalles de todos los procesos filtrados
+      // Filtrar casos basados en el tipo de reporte (independiente de los filtros del dashboard)
+      let reportCases = [...cases];
+      if (reportType !== 'all') {
+        reportCases = reportCases.filter((c) => c.processStatus === reportType);
+      }
+
+      if (reportCases.length === 0) {
+        setErrorMsg('No hay casos para el tipo de reporte seleccionado.');
+        return;
+      }
+
+      // Obtener detalles de los casos filtrados para el reporte
       const detailedCases = await Promise.all(
-        filteredCases.map((c) => fetchCaseDetails(c.processId))
+        reportCases.map((c) => fetchCaseDetails(c.processId))
       );
 
       // Generar HTML del reporte
@@ -172,7 +184,13 @@ function CaseDashboard() {
             </style>
           </head>
           <body>
-            <h1>Reporte Completo de Procesos</h1>
+            <h1>Reporte ${
+              reportType === 'all'
+                ? 'General'
+                : `de Procesos ${
+                    reportType.charAt(0).toUpperCase() + reportType.slice(1)
+                  }`
+            }</h1>
             <p><strong>Fecha del reporte:</strong> ${new Date().toLocaleDateString(
               'es-ES',
               {
@@ -212,11 +230,12 @@ function CaseDashboard() {
               <li>
                 <strong>${ev.name}</strong> (Inicio: ${new Date(
               ev.dateStart
-            ).toLocaleDateString('es-ES')}${
-              ev.dateEnd
-                ? `, Fin: ${new Date(ev.dateEnd).toLocaleDateString('es-ES')}`
-                : ''
-            })
+            ).toLocaleDateString('es-ES')}, 
+                Fin: ${
+                  ev.dateEnd
+                    ? new Date(ev.dateEnd).toLocaleDateString('es-ES')
+                    : 'Pendiente'
+                })
               </li>
             `;
           });
@@ -260,10 +279,20 @@ function CaseDashboard() {
           >
             ➕ Crear nuevo proceso
           </button>
+          <select
+            value={reportType}
+            onChange={(e) => setReportType(e.target.value)}
+            className="p-2 rounded bg-gray-800 border border-gray-600 text-white"
+          >
+            <option value="all">General (Todos)</option>
+            <option value="no iniciado">No iniciado</option>
+            <option value="en progreso">En progreso</option>
+            <option value="completado">Completado</option>
+          </select>
           <button
             onClick={handlePrintReport}
             className="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800 disabled:bg-gray-500"
-            disabled={loading || filteredCases.length === 0}
+            disabled={loading || cases.length === 0}
           >
             📄 Generar e Imprimir Reporte
           </button>
