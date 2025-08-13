@@ -9,7 +9,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRET,
 });
 
-// Configuración para imágenes de perfil (carpeta profilePictures)
+// Configuración para imágenes de perfil (solo imágenes)
 const profilePicturesStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -20,36 +20,46 @@ const profilePicturesStorage = new CloudinaryStorage({
   },
 });
 
-// Configuración para evidencias (carpeta evidences, imágenes y videos)
+// Configuración para evidencias (imágenes, videos y documentos)
 const evidenceStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'evidences',
     type: 'authenticated',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'mp4', 'mov'],
-    resource_type: 'auto', // Soporta imágenes y videos
+    allowed_formats: [
+      'jpg',
+      'png',
+      'jpeg', // imágenes
+      'mp4',
+      'mov', // videos
+      'pdf',
+      'doc',
+      'docx', // documentos
+    ],
+    resource_type: 'auto', // Detecta imágenes, videos y documentos
   },
 });
 
-// Configurar Multer para imágenes de perfil
+// Multer para imágenes de perfil
 const uploadProfilePictures = multer({
   storage: profilePicturesStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Límite de 5MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
-// Configurar Multer para evidencias
+// Multer para evidencias
 const uploadEvidence = multer({
   storage: evidenceStorage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // Límite de 10MB para videos
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB para videos/documentos
 });
 
+// Crear URL firmada con vencimiento
 function createSignedURL(publicId, durationSeconds) {
   const signedUrl = cloudinary.url(publicId, {
     sign_url: true,
     secure: true,
     type: 'authenticated',
     expires_at: Math.floor(Date.now() / 1000) + durationSeconds,
-    resource_type: 'auto', // Soporta imágenes y videos
+    resource_type: 'auto',
   });
   return signedUrl;
 }
